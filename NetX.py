@@ -7,8 +7,8 @@ import classes as pls
 
 
 #Define the local path of the shapefile  
-edges_path = "./Data/delft_waterlines.shp"
-nodes_path = "./Data/delft_nodes.shp"
+edges_path = "./Data/test_network.shp"
+nodes_path = "./Data/test_nodes.shp"
 
 
 #Read the shp files 
@@ -19,31 +19,41 @@ pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
 
 
-
-
 fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges,nodes)
-
 
 # print("nodes of graph X:",X.number_of_nodes()," Nodes of graph N:",len(pos_n))
 
+firstnode= pos_e[0]
+print(firstnode)
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 100 "plastic" objects at x:0 ,y:0
 plastics_100 = pls.create_plastics(5)
 
 #Create n "node" objects. n = G.number_of_nodes() 
-nodes = []
-for d in N.nodes.items():
-    nodes.append(pls.node(d[1]["id"],d[0][0],d[0][1],{k:d[1][k] for k in d[1].keys()}))
+nodes = {}
+relevant_nodes= {k[0]:k[1] for k in N.nodes.items()}
+for d in G.nodes.items():
+
+    if d[0] in relevant_nodes.keys():
+
+        nodes[d[0]]=pls.node(relevant_nodes[d[0]]["index"],d[0][0],d[0][1],{k:relevant_nodes[d[0]][k] for k in relevant_nodes[d[0]].keys()})
+    else:
+        nodes[d[0]]=pls.node(str(list(pos_e.keys())[list(pos_e.values()).index(d[0])]),d[0][0],d[0][1],{})
+
 #######################--------------------------------------------------##########################
 
 #Pour all of the plastics (100) consecutively into the first 20 nodes of the water network. max value: size(nodes)-2
+print(nodes)
 c=0
 for plastic_unit in plastics_100:
-    nodes[0].insert_plastic(plastic_unit)
-    plastic_unit.has_visited(nodes[0])
+    nodes[firstnode].insert_plastic(plastic_unit)
+    plastic_unit.has_visited(nodes[firstnode])
 
-print("PREV VISIT: ",plastics_100[0].prev_visit)
+#neighboring node.
+for node in G.nodes():
+    print("Neighbor:",tuple(nx.all_neighbors(G,node)), "of node:",tuple(node))
+    print("DEEEES MEEEEE",nodes[tuple(nx.all_neighbors(G,node))[0]].id, nodes[tuple(node)].id )
     # if c <= 18 :
     #     nodes[c].insert_plastic(plastic_unit)
     #     c+=1
@@ -63,11 +73,10 @@ print("PREV VISIT: ",plastics_100[0].prev_visit)
 
 
 
-
 #Display network graph figure
 pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
-pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes)} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-pos_node ={k:v.coords() for k,v in enumerate(nodes)} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
+pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes.values())} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
+pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 
 
 X=nx.MultiGraph()
