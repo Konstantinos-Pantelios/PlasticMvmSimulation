@@ -32,7 +32,7 @@ class plastic:
 
 class node:
     characteristics = ["Deadends","Junction"]
-    def __init__(self, id, x, y):
+    def __init__(self, id, x, y, f):
         """ This is an object corresponding to nodes in a water network (or other).
         Currently (29-05-2021) its attributes are:
             id: An identification of the node (it is NOT a primary key)
@@ -54,6 +54,7 @@ class node:
         self.x = x
         self.y = y
         self.plastic_list=[]
+        self.fields=f
         
     def __str__(self):
         return ("<Node No"+str(self.id)+" (OBJECT stored in "+str(hex(id(self)))+")>")

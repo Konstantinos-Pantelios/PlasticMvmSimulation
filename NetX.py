@@ -33,10 +33,9 @@ plastics_100 = pls.create_plastics(100)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = []
-for index in pos_n.keys():
-    nodes.append(pls.node(index,pos_n[index][0],pos_n[index][1]))
+for d in N.nodes.items():
+    nodes.append(pls.node(d[1]["id"],d[0][0],d[0][1],{k:d[1][k] for k in d[1].keys()}))
 #######################--------------------------------------------------##########################
-
 
 #Pour all of the plastics (100) consecutively into the first 20 nodes of the water network. max value: size(nodes)-2
 c=0
@@ -53,7 +52,10 @@ for plastic_unit in plastics_100:
 # plastics_100[52].coords()
 # plastics_100[52].find_in_node(nodes)
 # nodes[31].has_plastics()
+# print(nodes[0].fields['class'])
 ##############################################
+
+
 
 
 #Display network graph figure
