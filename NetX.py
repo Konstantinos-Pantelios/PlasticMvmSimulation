@@ -7,8 +7,8 @@ import plastics as pls
 
 
 #Define the local path of the shapefile  
-edges_path = "/home/konstantinos/Desktop/TUDelft-Courses/Q4/GEO1101/Clean water layer/data/delft_waterlines.shp"
-nodes_path = "/home/konstantinos/Desktop/TUDelft-Courses/Q4/GEO1101/Clean water layer/data/delft_nodes.shp"
+edges_path = "./Data/delft_waterlines.shp"
+nodes_path = "./Data/delft_nodes.shp"
 
 
 #Read the shp files 
@@ -18,7 +18,7 @@ N = nx.read_shp(nodes_path,simplify=False,strict=False) # Relevant to project no
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
 
-print(pos_n)
+
 
 
 fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges,nodes)
