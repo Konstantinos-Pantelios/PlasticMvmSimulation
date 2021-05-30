@@ -29,7 +29,7 @@ fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 100 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(100)
+plastics_100 = pls.create_plastics(5)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = []
@@ -40,12 +40,16 @@ for d in N.nodes.items():
 #Pour all of the plastics (100) consecutively into the first 20 nodes of the water network. max value: size(nodes)-2
 c=0
 for plastic_unit in plastics_100:
-    if c <= 18 :
-        nodes[c].insert_plastic(plastic_unit)
-        c+=1
-    else:
-        nodes[c].insert_plastic(plastic_unit)
-        c=0
+    nodes[0].insert_plastic(plastic_unit)
+    plastic_unit.has_visited(nodes[0])
+
+print("PREV VISIT: ",plastics_100[0].prev_visit)
+    # if c <= 18 :
+    #     nodes[c].insert_plastic(plastic_unit)
+    #     c+=1
+    # else:
+    #     nodes[c].insert_plastic(plastic_unit)
+    #     c=0
 ###### Test of the methods of the classes ####
 # plastics_100[0].coords()
 # nodes[0].has_plastics_num()
@@ -54,6 +58,8 @@ for plastic_unit in plastics_100:
 # nodes[31].has_plastics()
 # print(nodes[0].fields['class'])
 ##############################################
+
+
 
 
 

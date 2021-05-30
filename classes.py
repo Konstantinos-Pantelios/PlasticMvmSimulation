@@ -14,6 +14,7 @@ class plastic:
         self.id = id
         self.x = x
         self.y = y
+        self.prev_visit = None
 
     def __str__(self):
         return ("<Plastic unit No"+str(self.id)+" (OBJECT stored in "+str(hex(id(self)))+")>")
@@ -27,6 +28,10 @@ class plastic:
             if self in node.plastic_list:
                 print("Plastic unit with id:"+str(self.id)+" is in node:"+str(node.id)+"\n")
                 return node.id 
+
+    def has_visited(self,node):
+        self.prev_visit = node
+        return node            
 
 
 
