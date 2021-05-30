@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 from numpy.core.fromnumeric import size
-import plastics as pls
+import classes as pls
 
 
 
