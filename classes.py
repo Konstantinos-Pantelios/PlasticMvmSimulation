@@ -15,18 +15,19 @@ class plastic:
         self.x = x
         self.y = y
         self.prev_visit = None
+        self.velocity = 5 # m per min
 
     def __str__(self):
         return ("<Plastic unit No"+str(self.id)+" (OBJECT stored in "+str(hex(id(self)))+")>")
 
     def coords(self):
-        print("The plastic unit "+str(self.id)+" is currently located at x:"+str(self.x)+", y:"+str(self.y)+".\n")
+        #print("The plastic unit "+str(self.id)+" is currently located at x:"+str(self.x)+", y:"+str(self.y)+".\n")
         return (self.x,self.y)
 
     def find_in_node(self, nodes):
         for node in nodes:
             if self in node.plastic_list:
-                print("Plastic unit with id:"+str(self.id)+" is in node:"+str(node.id)+"\n")
+                #print("Plastic unit with id:"+str(self.id)+" is in node:"+str(node.id)+"\n")
                 return node.id 
 
     def has_visited(self,node):
@@ -65,25 +66,25 @@ class node:
         return ("<Node No"+str(self.id)+" (OBJECT stored in "+str(hex(id(self)))+")>")
 
     def coords(self):
-        print("The node "+str(self.id)+" is located at x:"+str(self.x)+", y:"+str(self.y)+".\n")
+        #print("The node "+str(self.id)+" is located at x:"+str(self.x)+", y:"+str(self.y)+".\n")
         return (self.x,self.y)
 
     def insert_plastic(self, plastic):
-        print("Plastic of id:"+str(plastic.id)+" has been inserted to node:"+ str(self.id)+"\n")
+        #print("Plastic of id:"+str(plastic.id)+" has been inserted to node:"+ str(self.id)+"\n")
         plastic.x = self.x
         plastic.y = self.y
         self.plastic_list.append(plastic)
 
     def has_plastics_num(self):
         pls_num = len(self.plastic_list)
-        print("The node "+str(self.id)+" has "+str(pls_num)+ " pieces of plastic in it.\n")
+        #print("The node "+str(self.id)+" has "+str(pls_num)+ " pieces of plastic in it.\n")
         return pls_num
 
     def has_plastics(self):
         pls = []
-        for p in self.plastic_list: pls.append(p.id)
-        print("The node "+str(self.id)+" has the following pieces of plastic in it.")
-        print(pls)
+        for p in self.plastic_list: pls.append(p)
+       # print("The node "+str(self.id)+" has the following pieces of plastic in it.")
+        #print(pls)
         return pls
 
 

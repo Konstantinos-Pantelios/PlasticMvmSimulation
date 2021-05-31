@@ -24,7 +24,7 @@ fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges
 
 
 firstnode = pos_e[0]
-print(firstnode)
+#print(firstnode)
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 100 "plastic" objects at x:0 ,y:0
@@ -42,7 +42,6 @@ for d in G.nodes.items():
 #######################--------------------------------------------------##########################
 
 #Pour all of the plastics (100) consecutively into the first 20 nodes of the water network. max value: size(nodes)-2
-print(nodes)
 c=0
 for plastic_unit in plastics_100:
     nodes[firstnode].insert_plastic(plastic_unit)
@@ -77,7 +76,7 @@ pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes.values())} # Ge
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 
 
-X=nx.MultiGraph()
+X=nx.DiGraph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
 edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
