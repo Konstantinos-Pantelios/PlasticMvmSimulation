@@ -27,7 +27,7 @@ firstnode = pos_e[0]
 #print(firstnode)
 
 #######################-------------- Instantiate Objects ---------------##########################
-#Create 100 "plastic" objects at x:0 ,y:0
+#Create 5 "plastic" objects at x:0 ,y:0
 plastics_100 = pls.create_plastics(5)
 
 #Create n "node" objects. n = G.number_of_nodes() 
@@ -65,7 +65,6 @@ for plastic_unit in plastics_100:
 # nodes[31].has_plastics()
 # print(nodes[0].fields['class'])
 ##############################################
-
 
 sim.simulation(G,nodes,plastics_100)
 

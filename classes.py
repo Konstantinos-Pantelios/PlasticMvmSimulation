@@ -1,7 +1,5 @@
 import math
 
-from networkx.classes.function import degree
-
 class plastic:
 
     def __init__(self, id, x ,y):

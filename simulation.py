@@ -1,5 +1,6 @@
 import networkx as nx
 import classes as pls
+import random
 
 def simulation(graph,nodes,plastics):
     
@@ -8,7 +9,7 @@ def simulation(graph,nodes,plastics):
     #graph = Graph
     #graph.nodes(data=True) = [((x1,y1),{}),((x2,y2),{}),...]
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
-    wind_angle = 45 #in degrees fron North CW
+    #wind_angle = 30 #in degrees fron North CW
 
     for minute in range(60): # for every minute in an hour 
         print("We are at the ",minute, "minute.")
@@ -21,36 +22,49 @@ def simulation(graph,nodes,plastics):
                 print("we are at neighbor:", nodes[neigh])
                 distance = pls.distance(node_coords,neigh)
                 edge_angle = pls.angle(node_coords,neigh)
-                wind_angle=0
+                wind_angle = 0
                 relative_angle=0
                 
                 if edge_angle[1]==1:
                     relative_angle = abs(wind_angle - edge_angle[0])
                 elif edge_angle[1]==2:
-                    wind_angle=90-wind_angle
+                    wind_angle=wind_angle-90
                     if wind_angle<0:
                         relative_angle = abs(360+wind_angle - edge_angle[0])
                     else:
                         relative_angle =  abs(wind_angle - edge_angle[0])
                 elif edge_angle[1]==3:
-                    wind_angle=180-wind_angle
+                    wind_angle=wind_angle-180
                     if wind_angle<0:
                         relative_angle = abs(360+wind_angle - edge_angle[0])
                     else:
                         relative_angle =  abs(wind_angle - edge_angle[0])
                 elif edge_angle[1]==4:
-                    wind_angle=270-wind_angle
+                    wind_angle=wind_angle-270
                     if wind_angle<0:
                         relative_angle = abs(360+wind_angle - edge_angle[0])
                     else:
                         relative_angle =  abs(wind_angle - edge_angle[0])        
 
-                print("Positive",relative_angle,wind_angle, edge_angle)
-                
-                if relative_angle<=89:
-                    is_in_node.remove_plastic(plastic_unit)
-                    nodes[neigh].insert_plastic(plastic_unit)
-                    break
+                #print("Positive",relative_angle,wind_angle, edge_angle)
+                chance = random.randint(1,100)
+                print("Relative angle:",relative_angle,"chance:",chance)
+                if relative_angle>=0 and relative_angle<=20:
+                    if chance <= 90:
+                        is_in_node.remove_plastic(plastic_unit)
+                        nodes[neigh].insert_plastic(plastic_unit)
+                        break
+                elif relative_angle>20 and relative_angle <=45:
+                    if chance <= 70:
+                        is_in_node.remove_plastic(plastic_unit)
+                        nodes[neigh].insert_plastic(plastic_unit)
+                        break
+                elif relative_angle>45 and relative_angle <=90:
+                    if chance <= 50:
+                        is_in_node.remove_plastic(plastic_unit)
+                        nodes[neigh].insert_plastic(plastic_unit)
+                        break    
+                #elif relative_angle 
 
 
 
