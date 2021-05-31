@@ -1,3 +1,7 @@
+import math
+
+from networkx.classes.function import degree
+
 class plastic:
 
     def __init__(self, id, x ,y):
@@ -16,6 +20,7 @@ class plastic:
         self.y = y
         self.prev_visit = None
         self.velocity = 5 # m per min
+        self.dist_to_node = 0
 
     def __str__(self):
         return ("<Plastic unit No"+str(self.id)+" (OBJECT stored in "+str(hex(id(self)))+")>")
@@ -25,10 +30,10 @@ class plastic:
         return (self.x,self.y)
 
     def find_in_node(self, nodes):
-        for node in nodes:
-            if self in node.plastic_list:
+        for node in nodes.keys():
+            if self in nodes[node].plastic_list:
                 #print("Plastic unit with id:"+str(self.id)+" is in node:"+str(node.id)+"\n")
-                return node.id 
+                return nodes[node]
 
     def has_visited(self,node):
         self.prev_visit = node
@@ -74,6 +79,9 @@ class node:
         plastic.x = self.x
         plastic.y = self.y
         self.plastic_list.append(plastic)
+
+    def remove_plastic(self,plastic):
+        self.plastic_list.remove(plastic)
 
     def has_plastics_num(self):
         pls_num = len(self.plastic_list)
@@ -123,4 +131,29 @@ def create_plastics(amount):
     for i in range(amount):        
         pls.append(plastic(i,0,0))
     return pls
+
+def distance(p1,p2):
+    p1x=p1[0]
+    p1y=p1[1]
+    p2x=p2[0]
+    p2y=p2[1]
+    return round(((p2x-p1x)**2 + (p2y-p1y)**2)**0.5)
+
+def angle(p1,p2):
+    p1x=p1[0]
+    p1y=p1[1]
+    p2x=p2[0]
+    p2y=p2[1]
+    qy=p2y-p1y
+    qx=p2x-p1x
+    if qy>=0 and qx>=0:
+        Q=1
+    elif qy<0 and qx>0:
+        Q=2
+    elif qy<0 and qx<0:
+        Q=3
+    elif qy>0 and qx<0:
+        Q=4
+
+    return (round(math.degrees(math.atan2(abs(qy),abs(qx)))),Q)
 

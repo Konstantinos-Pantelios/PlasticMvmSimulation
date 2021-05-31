@@ -78,7 +78,7 @@ pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes.values())} # Ge
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 
 
-X=nx.DiGraph()
+X=nx.MultiGraph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
 edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
