@@ -1,7 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from numpy.core.fromnumeric import size
 import classes as pls
+import simulation as sim
 
 
 
@@ -21,9 +21,9 @@ pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes
 
 fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges,nodes)
 
-# print("nodes of graph X:",X.number_of_nodes()," Nodes of graph N:",len(pos_n))
 
-firstnode= pos_e[0]
+
+firstnode = pos_e[0]
 print(firstnode)
 
 #######################-------------- Instantiate Objects ---------------##########################
@@ -34,9 +34,7 @@ plastics_100 = pls.create_plastics(5)
 nodes = {}
 relevant_nodes= {k[0]:k[1] for k in N.nodes.items()}
 for d in G.nodes.items():
-
     if d[0] in relevant_nodes.keys():
-
         nodes[d[0]]=pls.node(relevant_nodes[d[0]]["index"],d[0][0],d[0][1],{k:relevant_nodes[d[0]][k] for k in relevant_nodes[d[0]].keys()})
     else:
         nodes[d[0]]=pls.node(str(list(pos_e.keys())[list(pos_e.values()).index(d[0])]),d[0][0],d[0][1],{})
@@ -51,9 +49,9 @@ for plastic_unit in plastics_100:
     plastic_unit.has_visited(nodes[firstnode])
 
 #neighboring node.
-for node in G.nodes():
-    print("Neighbor:",tuple(nx.all_neighbors(G,node)), "of node:",tuple(node))
-    print("DEEEES MEEEEE",nodes[tuple(nx.all_neighbors(G,node))[0]].id, nodes[tuple(node)].id )
+# for node in G.nodes():
+#     print("Neighbor:",tuple(nx.all_neighbors(G,node)), "of node:",tuple(node))
+#     print("DEEEES MEEEEE",nodes[tuple(nx.all_neighbors(G,node))[0]].id, nodes[tuple(node)].id )
     # if c <= 18 :
     #     nodes[c].insert_plastic(plastic_unit)
     #     c+=1
@@ -70,7 +68,7 @@ for node in G.nodes():
 ##############################################
 
 
-
+sim.simulation(G,nodes,plastics_100)
 
 
 #Display network graph figure
