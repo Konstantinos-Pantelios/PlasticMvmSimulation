@@ -1,7 +1,5 @@
 import math
 
-from networkx.classes.function import degree
-
 class plastic:
 
     def __init__(self, id, x ,y):
@@ -148,11 +146,11 @@ def angle(p1,p2):
     qx=p2x-p1x
     if qy>=0 and qx>=0:
         Q=1
-    elif qy<0 and qx>0:
+    elif qy<=0 and qx>=0:
         Q=2
-    elif qy<0 and qx<0:
+    elif qy<=0 and qx<=0:
         Q=3
-    elif qy>0 and qx<0:
+    elif qy>=0 and qx<=0:
         Q=4
 
     return (round(math.degrees(math.atan2(abs(qy),abs(qx)))),Q)
