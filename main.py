@@ -19,7 +19,7 @@ nodes_path = "./Data/test_nodes.shp"
 #Read the shp files 
 G = nx.read_shp(edges_path,simplify=False,strict=False) # Water network graph (Contains ALL nodes between different edges that are irrelevant for the project)
 N = nx.read_shp(nodes_path,simplify=False,strict=False) # Relevant to project node graph (DOES NOT contain any edges)
-im = plt.imread('Data/compass_PNG25581.png',format='png')
+
 
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
@@ -34,7 +34,7 @@ firstnode = pos_e[0]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 5 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(100)
+plastics_100 = pls.create_plastics(5)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}

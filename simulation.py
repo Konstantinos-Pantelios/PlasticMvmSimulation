@@ -11,7 +11,7 @@ def simulation(graph,nodes,plastics,wind):
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
     #wind_angle = 30 #in degrees fron North CW
 
-    for minute in range(20): # for every minute in an hour 
+    for minute in range(1): # for every minute in an hour 
         print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             print("We are at plastic:",plastic_unit)
@@ -48,7 +48,7 @@ def simulation(graph,nodes,plastics,wind):
 
                 #print("Positive",relative_angle,wind_angle, edge_angle)
                 chance = random.randint(1,100)
-                print("Relative angle:",relative_angle,"chance:",chance)
+                print("Relative angle:",relative_angle,"wind angle:",wind_angle,"edge direction:", edge_angle)
                 if relative_angle>=0 and relative_angle<=20:
                     if chance <= 95:
                         is_in_node.remove_plastic(plastic_unit)
