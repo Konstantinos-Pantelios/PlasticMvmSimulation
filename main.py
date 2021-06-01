@@ -32,12 +32,20 @@ plastics_100 = pls.create_plastics(5)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
-relevant_nodes= {k[0]:k[1] for k in N.nodes.items()}
+relevant_nodes= {k[0]:k[1] for k in N.nodes.items()} #Dictionary {(x1,y1):{filed1:value1,field11:value11,..},..}
 for d in G.nodes.items():
     if d[0] in relevant_nodes.keys():
-        nodes[d[0]]=pls.node(relevant_nodes[d[0]]["index"],d[0][0],d[0][1],{k:relevant_nodes[d[0]][k] for k in relevant_nodes[d[0]].keys()})
+        identification = relevant_nodes[d[0]]["index"]
+        x_coord = d[0][0]
+        y_coord = d[0][1]
+        attributes = {k:relevant_nodes[d[0]][k] for k in relevant_nodes[d[0]].keys()}
+        nodes[d[0]]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate decision making node object inside a dictionary {(x1,y1):<node_object>,..}
     else:
-        nodes[d[0]]=pls.node(str(list(pos_e.keys())[list(pos_e.values()).index(d[0])]),d[0][0],d[0][1],{})
+        identification = str(list(pos_e.keys())[list(pos_e.values()).index(d[0])])
+        x_coord = d[0][0]
+        y_coord = d[0][1]
+        attributes = {}
+        nodes[d[0]]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate irrelevant node object inside a dictionary {(x1,y1):<node_object>,..}
 
 #######################--------------------------------------------------##########################
 
