@@ -142,16 +142,16 @@ def angle(p1,p2):
     p1y=p1[1]
     p2x=p2[0]
     p2y=p2[1]
-    qy=p2y-p1y
-    qx=p2x-p1x
-    if qy>=0 and qx>=0:
+    dy=p2y-p1y
+    dx=p2x-p1x
+    if dy>=0 and dx>=0:
         Q=1
-    elif qy<=0 and qx>=0:
+    elif dy<=0 and dx>=0:
         Q=2
-    elif qy<=0 and qx<=0:
+    elif dy<=0 and dx<=0:
         Q=3
-    elif qy>=0 and qx<=0:
+    elif dy>=0 and dx<=0:
         Q=4
-
-    return (round(math.degrees(math.atan2(abs(qy),abs(qx)))),Q)
+   
+    return (round(math.degrees(math.atan2(abs(dy),abs(dx)))),Q)
 

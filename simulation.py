@@ -1,6 +1,9 @@
+import math
 import networkx as nx
+from numpy.core.fromnumeric import size
 import classes as pls
 import random
+import numpy as np
 
 def simulation(graph,nodes,plastics,wind):
     
@@ -11,7 +14,7 @@ def simulation(graph,nodes,plastics,wind):
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
     #wind_angle = 30 #in degrees fron North CW
 
-    for minute in range(1): # for every minute in an hour 
+    for minute in range(60): # for every minute in an hour 
         print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             print("We are at plastic:",plastic_unit)
@@ -20,35 +23,47 @@ def simulation(graph,nodes,plastics,wind):
             neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
             for neigh in neighbors:
                 print("we are at neighbor:", nodes[neigh])
-                distance = pls.distance(node_coords,neigh)
-                edge_angle = pls.angle(node_coords,neigh)
                 wind_angle = wind
-                relative_angle=0
+                wind_x2 = 1*math.sin(math.radians(wind_angle))+node_coords[0]
+                wind_y2 = 1*math.cos(math.radians(wind_angle))+node_coords[1]
+                vector_wind =  np.subtract((wind_x2,wind_y2), node_coords)
+                vector_edge = np.subtract(neigh, node_coords)
+                norm = vector_edge/np.linalg.norm(vector_edge)
+                #print(norm,vector_edge,vector_wind)
+                relative_angle=math.degrees(math.atan2(np.linalg.norm(np.cross(vector_wind,norm)), np.dot(vector_wind,norm)))
+                #print("Relative angle:",relative_angle,"wind angle:",wind_angle, "edge",norm, "vector_wind",vector_wind,"NEIGHBOR", nodes[neigh].id, "CURRENT NODE:",is_in_node)
+                #math.acos(np.dot(norm,vector_wind))
                 
-                if edge_angle[1]==1:
-                    relative_angle = abs(wind_angle - edge_angle[0])
-                elif edge_angle[1]==2:
-                    wind_angle=wind_angle-90
-                    if wind_angle<0:
-                        relative_angle = abs(360-wind_angle + edge_angle[0])
-                    else:
-                        relative_angle =  abs(wind_angle - edge_angle[0])
-                elif edge_angle[1]==3:
-                    wind_angle=wind_angle-180
-                    if wind_angle<0:
-                        relative_angle = abs(360+wind_angle - edge_angle[0])
-                    else:
-                        relative_angle =  abs(wind_angle - edge_angle[0])
-                elif edge_angle[1]==4:
-                    wind_angle=wind_angle-270
-                    if wind_angle<0:
-                        relative_angle = abs(360+wind_angle - edge_angle[0])
-                    else:
-                        relative_angle =  abs(wind_angle - edge_angle[0])        
+                distance = pls.distance(node_coords,neigh)
+                #edge_angle = pls.angle(node_coords,neigh)
+                
+                
+                
+                
+                # if edge_angle[1]==1:
+                #     relative_angle = abs(wind_angle - edge_angle[0])
+                # elif edge_angle[1]==2:
+                #     wind_angle=wind_angle-90
+                #     if wind_angle<0:
+                #         relative_angle = abs(360-wind_angle + edge_angle[0])
+                #     else:
+                #         relative_angle =  abs(wind_angle - edge_angle[0])
+                # elif edge_angle[1]==3:
+                #     wind_angle=wind_angle-180
+                #     if wind_angle<0:
+                #         relative_angle = abs(360+wind_angle - edge_angle[0])
+                #     else:
+                #         relative_angle =  abs(wind_angle - edge_angle[0])
+                # elif edge_angle[1]==4:
+                #     wind_angle=wind_angle-270
+                #     if wind_angle<0:
+                #         relative_angle = abs(360+wind_angle - edge_angle[0])
+                #     else:
+                #         relative_angle =  abs(wind_angle - edge_angle[0])        
 
-                #print("Positive",relative_angle,wind_angle, edge_angle)
+                print("Positive",relative_angle, "Wind angle",wind_angle, )
                 chance = random.randint(1,100)
-                print("Relative angle:",relative_angle,"wind angle:",wind_angle,"edge direction:", edge_angle)
+                
                 if relative_angle>=0 and relative_angle<=20:
                     if chance <= 95:
                         is_in_node.remove_plastic(plastic_unit)
@@ -59,11 +74,17 @@ def simulation(graph,nodes,plastics,wind):
                         is_in_node.remove_plastic(plastic_unit)
                         nodes[neigh].insert_plastic(plastic_unit)
                         break
-                elif relative_angle>45 and relative_angle <=90:
+                elif relative_angle>45 and relative_angle <=80:
                     if chance <= 40:
                         is_in_node.remove_plastic(plastic_unit)
                         nodes[neigh].insert_plastic(plastic_unit)
                         break    
+                elif relative_angle>80 and relative_angle <=90:
+                    if chance <= 20:
+                        print("HERE", relative_angle)
+                        is_in_node.remove_plastic(plastic_unit)
+                        nodes[neigh].insert_plastic(plastic_unit)
+                        break 
                 #elif relative_angle 
 
 
