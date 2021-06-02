@@ -34,7 +34,7 @@ firstnode = pos_e[0]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 5 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(5)
+plastics_100 = pls.create_plastics(200)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -80,7 +80,7 @@ for plastic_unit in plastics_100:
 # print(nodes[0].fields['class'])
 ##############################################
 
-wind_direction=20
+wind_direction=270
 
 min_x=np.min([n[0] for n in nodes.keys()])
 min_y=np.min([n[1] for n in nodes.keys()])
@@ -119,7 +119,7 @@ sim.simulation(G,nodes,plastics_100,wind_direction)
 pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
 pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes.values())} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
-
+#
 X=nx.MultiGraph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
