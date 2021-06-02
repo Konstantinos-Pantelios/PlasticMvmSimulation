@@ -15,9 +15,9 @@ def simulation(graph,nodes,plastics,wind):
     #wind_angle = 30 #in degrees fron North CW
 
     for minute in range(60): # for every minute in an hour 
-        print("We are at the ",minute, "minute.")
+        #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
-            print("We are at plastic:",plastic_unit)
+            #print("We are at plastic:",plastic_unit)
             is_in_node = plastic_unit.find_in_node(nodes)
             node_coords = is_in_node.coords()
             neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
@@ -56,7 +56,6 @@ def simulation(graph,nodes,plastics,wind):
                         break    
                 elif relative_angle>80 and relative_angle <=90:
                     if chance <= 20:
-                        print("HERE", relative_angle)
                         is_in_node.remove_plastic(plastic_unit)
                         nodes[neigh].insert_plastic(plastic_unit)
                         break 

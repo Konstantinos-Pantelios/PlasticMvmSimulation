@@ -9,7 +9,7 @@ import numpy as np
 
 
 #Define the local path of the shapefile  
-edges_path = "./Data/test_network.shp"
+edges_path = "./Data/test_direction.shp"
 nodes_path = "./Data/test_nodes.shp"
 
 
@@ -23,7 +23,7 @@ N = nx.read_shp(nodes_path,simplify=False,strict=False) # Relevant to project no
 
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
-
+pos_e2 = {v:v for k,v in enumerate(G.nodes())}
 
 fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges,nodes)
 
@@ -74,13 +74,12 @@ dy = 80 * math.cos(math.radians(wind_direction))
 
 
 #Display network graph figure
-print(len(pos_n))
 pos_pls = {k: v for k,v in enumerate(G.nodes())}
 # pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
 pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes.values())} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 
-X=nx.MultiGraph()
+X=nx.DiGraph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
 edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
@@ -94,8 +93,8 @@ plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
 
 nx.draw_networkx_nodes(X, pos_pls,node_size=10)
 nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
-X.add_edges_from(edg)
-nx.draw_networkx_edges(X, pos_e)
+X.add_edges_from(G.edges())
+nx.draw_networkx_edges(X, pos_e2)
 
 
 sim.simulation(G,nodes,plastics_100,wind_direction)
@@ -105,10 +104,10 @@ pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated po
 pos_relabel = {k:v.has_plastics_num() for k,v in enumerate(nodes.values())} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 #
-X=nx.MultiGraph()
+X=nx.DiGraph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
-edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
+edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
 
 plt.subplot(122)
 plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=150, width=1) 
@@ -119,7 +118,7 @@ plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
 
 nx.draw_networkx_nodes(X, pos_pls,node_size=10)
 nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
-X.add_edges_from(edg)
-nx.draw_networkx_edges(X, pos_e)
+X.add_edges_from(G.edges())
+nx.draw_networkx_edges(X, pos_e2)
 
 plt.show()
