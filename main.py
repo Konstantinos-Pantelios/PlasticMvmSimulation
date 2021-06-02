@@ -61,23 +61,6 @@ for plastic_unit in plastics_100:
     nodes[firstnode].insert_plastic(plastic_unit)
     plastic_unit.has_visited(nodes[firstnode])
 
-#neighboring node.
-# for node in G.nodes():
-#     print("Neighbor:",tuple(nx.all_neighbors(G,node)), "of node:",tuple(node))
-#     print("DEEEES MEEEEE",nodes[tuple(nx.all_neighbors(G,node))[0]].id, nodes[tuple(node)].id )
-    # if c <= 18 :
-    #     nodes[c].insert_plastic(plastic_unit)
-    #     c+=1
-    # else:
-    #     nodes[c].insert_plastic(plastic_unit)
-    #     c=0
-###### Test of the methods of the classes ####
-# plastics_100[0].coords()
-# nodes[0].has_plastics_num()
-# plastics_100[52].coords()
-# plastics_100[52].find_in_node(nodes)
-# nodes[31].has_plastics()
-# print(nodes[0].fields['class'])
 ##############################################
 
 wind_direction=270
