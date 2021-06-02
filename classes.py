@@ -122,7 +122,7 @@ def show_fields(graph):
     return (gr_fields, n_fields)
 
 def create_plastics(amount):
-    """ This function instantiates "amount" number of plastic unit obejcts.
+    """ This function instantiates "amount" number of plastic unit objects.
     Input: Amount 
     Output: List of plastic unit objects"""
     pls=[]
