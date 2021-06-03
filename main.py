@@ -31,7 +31,7 @@ firstnode = pos_e[0]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 5 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(200)
+plastics_100 = pls.create_plastics(1000)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}

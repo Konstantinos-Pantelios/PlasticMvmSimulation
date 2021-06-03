@@ -1,6 +1,5 @@
 import math
 import networkx as nx
-from numpy.core.fromnumeric import size
 import classes as pls
 import random
 import numpy as np
@@ -29,7 +28,7 @@ def simulation(graph,nodes,plastics,wind,drift):
     #drift = int #in degrees from North CW
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    for minute in range(200): # for every minute in an hour 
+    for minute in range(15): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
@@ -48,8 +47,9 @@ def simulation(graph,nodes,plastics,wind,drift):
                 vector_forces = np.add(vector_wind,vector_flow)
                 
                 relative_angle = relative_angle_wind(vector_edge,vector_forces)
-                
+                plastic_unit.velocity=round(np.linalg.norm(vector_forces),2)
                 distance = pls.distance(node_coords,neigh)
+                
  
 
                 #print("Positive",relative_angle, "Wind angle",wind_angle, )
