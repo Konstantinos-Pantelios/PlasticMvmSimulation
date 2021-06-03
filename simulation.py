@@ -4,17 +4,17 @@ from numpy.core.fromnumeric import size
 import classes as pls
 import random
 import numpy as np
-def vectorize_angle(angle, p, magnitude):
+def vectorize_byangle(angle, p, magnitude):
     x2 = magnitude*math.sin(math.radians(angle))+p[0]
     y2 = magnitude*math.cos(math.radians(angle))+p[1]
     return np.subtract((x2,y2), p)
 
-def vectorize_coords(p1, p2):
+def vectorize_bycoords(p1, p2):
     return np.subtract(p2, p1)
 
-def relative_angle_wind(edge,wind):
+def relative_angle_wind(edge,forces):
     norm = edge/np.linalg.norm(edge)
-    return math.degrees(math.atan2(np.linalg.norm(np.cross(wind,norm)), np.dot(wind,norm)))
+    return math.degrees(math.atan2(np.linalg.norm(np.cross(forces,norm)), np.dot(forces,norm)))
 
 
 
@@ -27,7 +27,7 @@ def simulation(graph,nodes,plastics,wind,drift):
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
     #wind = int #in degrees fron North CW
     #drift = int #in degrees from North CW
-    
+
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
     for minute in range(200): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
@@ -40,10 +40,14 @@ def simulation(graph,nodes,plastics,wind,drift):
                 #print("we are at neighbor:", nodes[neigh])
                 
                 
-                vector_wind = vectorize_angle(wind_angle,node_coords,plastic_unit.wind_speed)
-                vector_edge = vectorize_coords(node_coords,neigh)
+                vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed)
+                vector_edge = vectorize_bycoords(node_coords,neigh)
+                edge_dir = math.atan2(vector_edge[1],vector_edge[0])
+                #if neigh has direction it means that it has flow so: vector_flow = vecorize_byangle(atan2(vector_edge[1],vector_edge[0]),neigh,plastic_unit.flow_speed else take into acount ONLY the wind)
+                vector_flow = vectorize_byangle(edge_dir,node_coords,0)
+                vector_forces = np.add(vector_wind,vector_flow)
                 
-                relative_angle = relative_angle_wind(vector_edge,vector_wind)
+                relative_angle = relative_angle_wind(vector_edge,vector_forces)
                 
                 distance = pls.distance(node_coords,neigh)
  

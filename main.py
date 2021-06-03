@@ -60,7 +60,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=270
+wind_direction=0
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
