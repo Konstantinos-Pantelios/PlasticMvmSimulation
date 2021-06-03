@@ -14,7 +14,7 @@ def simulation(graph,nodes,plastics,wind):
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
     #wind_angle = 30 #in degrees fron North CW
 
-    for minute in range(60): # for every minute in an hour 
+    for minute in range(200): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
