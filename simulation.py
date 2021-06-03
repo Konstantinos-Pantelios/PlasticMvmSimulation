@@ -4,16 +4,31 @@ from numpy.core.fromnumeric import size
 import classes as pls
 import random
 import numpy as np
+def vectorize_angle(angle, p, magnitude):
+    x2 = magnitude*math.sin(math.radians(angle))+p[0]
+    y2 = magnitude*math.cos(math.radians(angle))+p[1]
+    return np.subtract((x2,y2), p)
 
-def simulation(graph,nodes,plastics,wind):
+def vectorize_coords(p1, p2):
+    return np.subtract(p2, p1)
+
+def relative_angle_wind(edge,wind):
+    norm = edge/np.linalg.norm(edge)
+    return math.degrees(math.atan2(np.linalg.norm(np.cross(wind,norm)), np.dot(wind,norm)))
+
+
+
+def simulation(graph,nodes,plastics,wind,drift):
     
     #plastics = [pls_object1, pls_object2,...]
     #nodes = {(x1,y1):pls_object1, (x2,y2):node_object2} Both relevant and irrelevant
     #graph = Graph
     #graph.nodes(data=True) = [((x1,y1),{}),((x2,y2),{}),...]
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
-    #wind_angle = 30 #in degrees fron North CW
-
+    #wind = int #in degrees fron North CW
+    #drift = int #in degrees from North CW
+    
+    wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
     for minute in range(200): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
@@ -23,15 +38,12 @@ def simulation(graph,nodes,plastics,wind):
             neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
             for neigh in neighbors:
                 #print("we are at neighbor:", nodes[neigh])
-                wind_angle = wind
-                wind_x2 = 1*math.sin(math.radians(wind_angle))+node_coords[0]
-                wind_y2 = 1*math.cos(math.radians(wind_angle))+node_coords[1]
-                vector_wind =  np.subtract((wind_x2,wind_y2), node_coords)
-                vector_edge = np.subtract(neigh, node_coords)
-                norm = vector_edge/np.linalg.norm(vector_edge)
-
-                relative_angle=math.degrees(math.atan2(np.linalg.norm(np.cross(vector_wind,norm)), np.dot(vector_wind,norm)))
-
+                
+                
+                vector_wind = vectorize_angle(wind_angle,node_coords,plastic_unit.wind_speed)
+                vector_edge = vectorize_coords(node_coords,neigh)
+                
+                relative_angle = relative_angle_wind(vector_edge,vector_wind)
                 
                 distance = pls.distance(node_coords,neigh)
  

@@ -60,15 +60,17 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=20
+wind_direction=270
+leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
 min_y=np.min([n[1] for n in nodes.keys()])
 max_x=np.max([n[0] for n in nodes.keys()])
 max_y=np.max([n[1] for n in nodes.keys()])
-dx = 80 * math.sin(math.radians(wind_direction))
-dy = 80 * math.cos(math.radians(wind_direction))
-
+dx_wind = 80 * math.sin(math.radians(wind_direction))
+dy_wind = 80 * math.cos(math.radians(wind_direction))
+dx_leeway = 80 * math.sin(math.radians(wind_direction+leeway_drift))
+dy_leeway = 80 * math.cos(math.radians(wind_direction+leeway_drift))
 
 #Display network graph figure
 pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)}
@@ -83,10 +85,12 @@ edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
 
 plt.subplot(121)
 plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=150, width=1) 
-plt.arrow(x=min_x-70, y=min_y-80, dx=dx, dy=dy, width=10)
+plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10)
+plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
 plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
-plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x-60, min_y-100))
+plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100))
 plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
+plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-140))
 
 nx.draw_networkx_nodes(X, pos_pls,node_size=10)
 nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
@@ -94,7 +98,7 @@ X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
 
 
-sim.simulation(G,nodes,plastics_100,wind_direction)
+sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
 
 #Display network graph figure
 pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
@@ -108,10 +112,12 @@ edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
 
 plt.subplot(122)
 plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=150, width=1) 
-plt.arrow(x=min_x-70, y=min_y-80, dx=dx, dy=dy, width=10) 
+plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10)
+plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
 plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
-plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x-60, min_y-100))
+plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100))
 plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
+plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-140))
 
 nx.draw_networkx_nodes(X, pos_pls,node_size=10)
 nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
