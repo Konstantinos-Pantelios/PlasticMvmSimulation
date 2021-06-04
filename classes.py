@@ -17,8 +17,10 @@ class plastic:
         self.x = x
         self.y = y
         self.prev_visit = None
+        self.going_to = None
+        self.direction = 0
         self.wind_speed = 10.5 # meters/min Assuming that the average wind speed in NL is 21km/h and 3% of it is traslated to movement.
-        self.flow_speed = 4 
+        self.flow_speed = 4
         self.velocity =0
         self.dist_to_node = 0
 

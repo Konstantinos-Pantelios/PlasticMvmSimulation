@@ -38,8 +38,8 @@ firstnode = pos_e[0]
 #print(firstnode)
 
 #######################-------------- Instantiate Objects ---------------##########################
-#Create 5 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(100)
+#Create n number of "plastic" objects at x:0 ,y:0
+plastics_100 = pls.create_plastics(200)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -68,7 +68,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=20
+wind_direction=130
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -117,10 +117,10 @@ for n in nodes.values():
     if n.has_plastics_num()>0: pos_forelabel.append(n)
 
 pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(pos_forelabel)} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
+node_plastic_count = list(f*2 for f in pos_relabel.values()) # list of number of plastics at the nodes
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 #
-X=nx.DiGraph()
+X=nx.Graph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
 edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
