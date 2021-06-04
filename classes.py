@@ -19,6 +19,7 @@ class plastic:
         self.prev_visit = None
         self.wind_speed = 10.5 # meters/min Assuming that the average wind speed in NL is 21km/h and 3% of it is traslated to movement.
         self.flow_speed = 4 
+        self.velocity =0
         self.dist_to_node = 0
 
     def __str__(self):

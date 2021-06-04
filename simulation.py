@@ -9,6 +9,7 @@ def vectorize_byangle(angle, p, magnitude):
     return np.subtract((x2,y2), p)
 
 def vectorize_bycoords(p1, p2):
+
     return np.subtract(p2, p1)
 
 def relative_angle_wind(edge,forces):
@@ -28,28 +29,39 @@ def simulation(graph,nodes,plastics,wind,drift):
     #drift = int #in degrees from North CW
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    for minute in range(15): # for every minute in an hour 
+    for minute in range(10): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
             is_in_node = plastic_unit.find_in_node(nodes)
             node_coords = is_in_node.coords()
-            neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
-            for neigh in neighbors:
+            #neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
+            succ=tuple(graph.successors(node_coords))
+            pred=tuple(graph.predecessors(node_coords))
+            neighbors={s:"S"for s in succ}
+            neighbors.update({p:"P" for p in pred})
+
+            for neigh in neighbors.keys():
                 #print("we are at neighbor:", nodes[neigh])
-                
+                direction = neighbors[neigh]
                 
                 vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed)
-                vector_edge = vectorize_bycoords(node_coords,neigh)
+                if direction == "S":
+                    vector_edge = vectorize_bycoords(node_coords,neigh)
+                elif direction == "P":
+                    vector_edge = vectorize_bycoords(neigh,node_coords)
+
                 edge_dir = math.atan2(vector_edge[1],vector_edge[0])
                 #if neigh has direction it means that it has flow so: vector_flow = vecorize_byangle(atan2(vector_edge[1],vector_edge[0]),neigh,plastic_unit.flow_speed else take into acount ONLY the wind)
-                vector_flow = vectorize_byangle(edge_dir,node_coords,0)
-                vector_forces = np.add(vector_wind,vector_flow)
+                if graph.nodes[neigh]['has_flow']:                     
+                    vector_flow = vectorize_byangle(edge_dir,node_coords,plastic_unit.flow_speed)
+                    vector_forces = np.add(vector_wind,vector_flow)
+                else: vector_forces = vector_wind
                 
                 relative_angle = relative_angle_wind(vector_edge,vector_forces)
                 plastic_unit.velocity=round(np.linalg.norm(vector_forces),2)
                 distance = pls.distance(node_coords,neigh)
-                
+                print(vector_forces,relative_angle)
  
 
                 #print("Positive",relative_angle, "Wind angle",wind_angle, )

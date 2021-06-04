@@ -17,12 +17,20 @@ nodes_path = "./Data/delft_nodes.shp"
 G = nx.read_shp(edges_path,simplify=False,strict=False) # Water network graph (Contains ALL nodes between different edges that are irrelevant for the project)
 N = nx.read_shp(nodes_path,simplify=False,strict=False) # Relevant to project node graph (DOES NOT contain any edges)
 
+for datadict in G.edges.items():
+    has_flow = datadict[1]['has_flow']
+    start_node=datadict[0][0]
+    end_node= datadict[0][1]
+    nx.nodes(G)[start_node].update({"has_flow":has_flow})
+    nx.nodes(G)[end_node].update({"has_flow":has_flow})
+
+        
 
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
 pos_e2 = {v:v for k,v in enumerate(G.nodes())}
 
-fields = pls.show_fields(N) # Get all availiable fields of the shp layer. (edges,nodes)
+fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges,nodes)
 
 
 
@@ -31,7 +39,7 @@ firstnode = pos_e[0]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 5 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(1000)
+plastics_100 = pls.create_plastics(1)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -60,7 +68,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=0
+wind_direction=310
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -105,7 +113,7 @@ pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated po
 pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 #
-X=nx.Graph()
+X=nx.DiGraph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
 edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
