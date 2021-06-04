@@ -1,6 +1,7 @@
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
+from numpy.lib.function_base import append
 import classes as pls
 import simulation as sim
 import numpy as np
@@ -24,7 +25,6 @@ for datadict in G.edges.items():
     nx.nodes(G)[start_node].update({"has_flow":has_flow})
     nx.nodes(G)[end_node].update({"has_flow":has_flow})
 
-        
 
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
@@ -39,7 +39,7 @@ firstnode = pos_e[0]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create 5 "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(1)
+plastics_100 = pls.create_plastics(100)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -55,7 +55,7 @@ for d in G.nodes.items():
         identification = str(list(pos_e.keys())[list(pos_e.values()).index(d[0])])
         x_coord = d[0][0]
         y_coord = d[0][1]
-        attributes = {}
+        attributes = d[1]
         nodes[d[0]]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate irrelevant node object inside a dictionary {(x1,y1):<node_object>,..}
 
 #######################--------------------------------------------------##########################
@@ -68,7 +68,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=310
+wind_direction=20
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -111,7 +111,12 @@ sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
 
 #Display network graph figure
 pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
-pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
+
+pos_forelabel= []
+for n in nodes.values(): 
+    if n.has_plastics_num()>0: pos_forelabel.append(n)
+
+pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(pos_forelabel)} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
 node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 #

@@ -29,7 +29,7 @@ def simulation(graph,nodes,plastics,wind,drift):
     #drift = int #in degrees from North CW
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    for minute in range(10): # for every minute in an hour 
+    for minute in range(50): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
