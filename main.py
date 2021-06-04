@@ -39,7 +39,7 @@ firstnode = pos_e[0]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create n number of "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(200)
+plastics_100 = pls.create_plastics(300)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -60,15 +60,15 @@ for d in G.nodes.items():
 
 #######################--------------------------------------------------##########################
 
-#Pour all of the plastics (100) consecutively into the first 20 nodes of the water network. max value: size(nodes)-2
-c=0
+#Pour all of the plastics into the first node of the water network. max value: size(nodes)-2
+
 for plastic_unit in plastics_100:
     nodes[firstnode].insert_plastic(plastic_unit)
     plastic_unit.has_visited(nodes[firstnode])
 
 ##############################################
 
-wind_direction=130
+wind_direction=40
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -110,16 +110,23 @@ nx.draw_networkx_edges(X, pos_e2)
 sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
 
 #Display network graph figure
-pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
+pls=[]
+for p in plastics_100:
+    if p.find_in_node(nodes) == None:
+        pls.append(p)
 
-pos_forelabel= []
-for n in nodes.values(): 
-    if n.has_plastics_num()>0: pos_forelabel.append(n)
+pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
+pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
+print(pos_pls)
+# pos_forelabel= []
+# for n in nodes.values(): 
+#     if n.has_plastics_num()>0: pos_forelabel.append(n)
 
-pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(pos_forelabel)} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-node_plastic_count = list(f*2 for f in pos_relabel.values()) # list of number of plastics at the nodes
+pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
+node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
-#
+
+
 X=nx.Graph()
 X.add_nodes_from(pos_pls.keys())
 l = [set(x) for x in G.edges()]
@@ -135,9 +142,29 @@ plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, mi
 plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
 plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-140))
 
-nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_relabel, node_size=node_plastic_count)
+
+nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count)
+nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re ,node_color='red', node_size=5,node_shape='*')
 # nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
 X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
+c=0
+for n in nodes.values():
+   c+=n.has_plastics_num() 
+print(len(plastics_100) - c )
+
+S=nx.DiGraph()
+S.add_nodes_from(pos_pls.values()) #check documentation if it removes duplicates
+print(len(pos_pls.values()))
+a=0
+for p in S.nodes.items():
+    a+=1
+    p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')'})
+print(a)
+
+nx.write_shp(S, './Data/plastics')
 
 plt.show()
+
+# TODO: Add node_size to plastics that are not in a node
+# TODO: Fix issue with wierd coordinate result of plastics outside of nodes.

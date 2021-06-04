@@ -16,7 +16,13 @@ def relative_angle_wind(edge,forces):
     norm = edge/np.linalg.norm(edge)
     return math.degrees(math.atan2(np.linalg.norm(np.cross(forces,norm)), np.dot(forces,norm)))
 
-
+def move(plastic_obj,direction,distance,node,neighbor):
+    node.remove_plastic(plastic_obj)
+    plastic_obj.dist_to_node=distance-plastic_obj.velocity
+    plastic_obj.x = plastic_obj.velocity*math.sin(math.radians(direction))+plastic_obj.x
+    plastic_obj.y = plastic_obj.velocity*math.cos(math.radians(direction))+plastic_obj.y
+    plastic_obj.going_to = neighbor
+    plastic_obj.direction = direction
 
 def simulation(graph,nodes,plastics,wind,drift):
     
@@ -34,6 +40,7 @@ def simulation(graph,nodes,plastics,wind,drift):
         for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
             is_in_node = plastic_unit.find_in_node(nodes)
+            #print(is_in_node)
             if is_in_node:
                 node_coords = is_in_node.coords()
                 #neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
@@ -70,55 +77,33 @@ def simulation(graph,nodes,plastics,wind,drift):
                         relative_angle = relative_angle_wind(vector_edge,vector_forces)
 
                     
-                    plastic_unit.velocity=round(np.linalg.norm(vector_forces),2) # calculate velocity based on the combined forces vector
+                    plastic_unit.velocity=np.linalg.norm(vector_forces) # calculate velocity based on the combined forces vector
+                    
                     distance = pls.distance(node_coords,neigh)
     
                     chance = random.randint(1,100)
                     
                     if relative_angle>=0 and relative_angle<=20:
                         if chance <= 95:
-                            is_in_node.remove_plastic(plastic_unit)
-                            #nodes[neigh].insert_plastic(plastic_unit)
-                            plastic_unit.dist_to_node=distance-plastic_unit.velocity
-                            plastic_unit.x = plastic_unit.velocity*math.sin(math.radians(edge_dir))+plastic_unit.x
-                            plastic_unit.y = plastic_unit.velocity*math.cos(math.radians(edge_dir))+plastic_unit.y
-                            plastic_unit.going_to = neigh
-                            plastic_unit.direction = edge_dir
+                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
                             break
                     elif relative_angle>20 and relative_angle <=45:
                         if chance <= 60:
-                            is_in_node.remove_plastic(plastic_unit)
-                            #nodes[neigh].insert_plastic(plastic_unit)
-                            plastic_unit.dist_to_node=distance-plastic_unit.velocity
-                            plastic_unit.x = plastic_unit.velocity*math.sin(math.radians(edge_dir))+plastic_unit.x
-                            plastic_unit.y = plastic_unit.velocity*math.cos(math.radians(edge_dir))+plastic_unit.y
-                            plastic_unit.going_to = neigh
-                            plastic_unit.direction = edge_dir
+                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
                             break
                     elif relative_angle>45 and relative_angle <=80:
                         if chance <= 40:
-                            is_in_node.remove_plastic(plastic_unit)
-                            #nodes[neigh].insert_plastic(plastic_unit)
-                            plastic_unit.dist_to_node=distance-plastic_unit.velocity
-                            plastic_unit.x = plastic_unit.velocity*math.sin(math.radians(edge_dir))+plastic_unit.x
-                            plastic_unit.y = plastic_unit.velocity*math.cos(math.radians(edge_dir))+plastic_unit.y
-                            plastic_unit.going_to = neigh
-                            plastic_unit.direction = edge_dir
+                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
                             break    
                     elif relative_angle>80 and relative_angle <=90:
                         if chance <= 20:
-                            is_in_node.remove_plastic(plastic_unit)
-                            #nodes[neigh].insert_plastic(plastic_unit)
-                            plastic_unit.dist_to_node=distance-plastic_unit.velocity
-                            plastic_unit.x = plastic_unit.velocity*math.sin(math.radians(edge_dir))+plastic_unit.x
-                            plastic_unit.y = plastic_unit.velocity*math.cos(math.radians(edge_dir))+plastic_unit.y
-                            plastic_unit.going_to = neigh
-                            plastic_unit.direction = edge_dir
+                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
                             break 
             else: 
                 plastic_unit.dist_to_node -= plastic_unit.velocity 
                 if plastic_unit.dist_to_node <= 0:
                     nodes[plastic_unit.going_to].insert_plastic(plastic_unit)
+                    
                     plastic_unit.x=plastic_unit.going_to[0]
                     plastic_unit.y=plastic_unit.going_to[1]
                 else:

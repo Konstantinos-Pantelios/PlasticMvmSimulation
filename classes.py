@@ -21,8 +21,8 @@ class plastic:
         self.direction = 0
         self.wind_speed = 10.5 # meters/min Assuming that the average wind speed in NL is 21km/h and 3% of it is traslated to movement.
         self.flow_speed = 4
-        self.velocity =0
-        self.dist_to_node = 0
+        self.velocity =0.0
+        self.dist_to_node = 0.0
 
     def __str__(self):
         return ("<Plastic unit No"+str(self.id)+" (OBJECT stored in "+str(hex(id(self)))+")>")
@@ -131,7 +131,7 @@ def create_plastics(amount):
     Output: List of plastic unit objects"""
     pls=[]
     for i in range(amount):        
-        pls.append(plastic(i,0,0))
+        pls.append(plastic(i,0.0,0.0))
     return pls
 
 def distance(p1,p2):
@@ -139,7 +139,7 @@ def distance(p1,p2):
     p1y=p1[1]
     p2x=p2[0]
     p2y=p2[1]
-    return round(((p2x-p1x)**2 + (p2y-p1y)**2)**0.5)
+    return ((p2x-p1x)**2 + (p2y-p1y)**2)**0.5
 
 def angle(p1,p2):
     p1x=p1[0]
