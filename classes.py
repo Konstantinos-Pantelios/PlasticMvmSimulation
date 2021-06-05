@@ -16,6 +16,8 @@ class plastic:
         self.id = id
         self.x = x
         self.y = y
+        self.is_active = True
+        self.activation_time = 0 
         self.prev_visit = None
         self.going_to = None
         self.direction = 0

@@ -19,10 +19,24 @@ def relative_angle_wind(edge,forces):
 def move(plastic_obj,direction,distance,node,neighbor):
     node.remove_plastic(plastic_obj)
     plastic_obj.dist_to_node=distance-plastic_obj.velocity
-    plastic_obj.x = plastic_obj.velocity*math.sin(math.radians(direction))+plastic_obj.x
-    plastic_obj.y = plastic_obj.velocity*math.cos(math.radians(direction))+plastic_obj.y
+    x0=plastic_obj.x
+    y0=plastic_obj.y
+    plastic_obj.x = plastic_obj.velocity*math.cos(direction)+x0 #
+    plastic_obj.y = plastic_obj.velocity*math.sin(direction)+y0 #
     plastic_obj.going_to = neighbor
     plastic_obj.direction = direction
+    plastic_obj.prev_visit = node
+
+def forces_prob(relative_angle):
+    if relative_angle>=0 and relative_angle<=20:
+        return 95
+    elif relative_angle>20 and relative_angle <=45:
+        return 60
+    elif relative_angle>45 and relative_angle <=80:
+        return 45   
+    elif relative_angle>80 and relative_angle <=90:
+        return 20
+    else: return 0
 
 def simulation(graph,nodes,plastics,wind,drift):
     
@@ -34,12 +48,17 @@ def simulation(graph,nodes,plastics,wind,drift):
     #wind = int #in degrees fron North CW
     #drift = int #in degrees from North CW
 
+    active_pls = [p for p in plastics if p.is_active]
+    #print(active_pls)
+
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    for minute in range(150): # for every minute in an hour 
+    while len(active_pls)>0: # for every minute in an hour 
+        print(active_pls)
         #print("We are at the ",minute, "minute.")
-        for plastic_unit in plastics: #for every plastic unit
+        for plastic_unit in active_pls: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
             is_in_node = plastic_unit.find_in_node(nodes)
+            plastic_unit.activation_time+=1
             #print(is_in_node)
             if is_in_node:
                 node_coords = is_in_node.coords()
@@ -48,6 +67,7 @@ def simulation(graph,nodes,plastics,wind,drift):
                 pred=tuple(graph.predecessors(node_coords))
                 neighbors={s:"S"for s in succ}
                 neighbors.update({p:"P" for p in pred})
+                
 
                 for neigh in neighbors.keys():
                     #print("we are at neighbor:", nodes[neigh])
@@ -79,35 +99,31 @@ def simulation(graph,nodes,plastics,wind,drift):
                     
                     plastic_unit.velocity=np.linalg.norm(vector_forces) # calculate velocity based on the combined forces vector
                     
-                    distance = pls.distance(node_coords,neigh)
+                    distance = math.dist(node_coords,neigh)
     
                     chance = random.randint(1,100)
+                    wind_flow = forces_prob(relative_angle)
+                    decision = wind_flow
+                    if chance <= decision:
+                        move(plastic_unit, edge_dir, distance, is_in_node, neigh)
+                    if decision<=0:
+                        plastic_unit.is_active = False 
+                    break
                     
-                    if relative_angle>=0 and relative_angle<=20:
-                        if chance <= 95:
-                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
-                            break
-                    elif relative_angle>20 and relative_angle <=45:
-                        if chance <= 60:
-                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
-                            break
-                    elif relative_angle>45 and relative_angle <=80:
-                        if chance <= 40:
-                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
-                            break    
-                    elif relative_angle>80 and relative_angle <=90:
-                        if chance <= 20:
-                            move(plastic_unit, edge_dir, distance, is_in_node, neigh)
-                            break 
             else: 
+                
                 plastic_unit.dist_to_node -= plastic_unit.velocity 
-                if plastic_unit.dist_to_node <= 0:
+                
+                if plastic_unit.dist_to_node <= 1:
                     nodes[plastic_unit.going_to].insert_plastic(plastic_unit)
                     
                     plastic_unit.x=plastic_unit.going_to[0]
                     plastic_unit.y=plastic_unit.going_to[1]
                 else:
-                    plastic_unit.x = plastic_unit.velocity*math.sin(math.radians(plastic_unit.direction))+plastic_unit.x
-                    plastic_unit.y = plastic_unit.velocity*math.cos(math.radians(plastic_unit.direction))+plastic_unit.y
+                    x0=plastic_unit.x
+                    y0=plastic_unit.y
+                    plastic_unit.x = plastic_unit.velocity*math.cos(plastic_unit.direction)+x0
+                    plastic_unit.y = plastic_unit.velocity*math.sin(plastic_unit.direction)+y0
+        active_pls = [p for p in plastics if p.is_active]
     
     return None
