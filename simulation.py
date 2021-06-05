@@ -60,8 +60,8 @@ def simulation(graph,nodes,plastics,wind,drift):
     
     
     
-    #while len(active_plastics)>0:          # Comment/Uncomment this to run until all plastics exit the simulation
-    for m in range(1,181):                 # Comment/Uncomment this to set specific time extention to the simulation.
+    while len(active_plastics)>0:          # Comment/Uncomment this to run until all plastics exit the simulation
+    #for m in range(1,80):                 # Comment/Uncomment this to set specific time extention to the simulation.
         #print("We are at the ",minute, "minute.")
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))

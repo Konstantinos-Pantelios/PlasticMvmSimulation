@@ -1,6 +1,7 @@
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import classes as pls
 import simulation as sim
 import numpy as np
@@ -91,13 +92,15 @@ l = [set(x) for x in G.edges()]
 edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
 
 plt.subplot(121)
+blue_patch = mpatches.Patch(color='tab:blue', label="Plastics in nodes")
 plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=150, width=1) 
-plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10)
+plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10,label="asdsad")
 plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
 plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
 plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100))
 plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
 plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-140))
+plt.legend(handles=[blue_patch])
 
 nx.draw_networkx_nodes(X, pos_pls, node_size=node_plastic_count)
 nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
@@ -136,6 +139,7 @@ edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
 
 
 plt.subplot(122)
+red_patch = mpatches.Patch(color='red', label="Plastics that haven't yet reached a particular node")
 plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=150, width=1) 
 plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10)
 plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
@@ -143,11 +147,12 @@ plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
 plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100))
 plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
 plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-140))
+plt.legend(handles=[blue_patch,red_patch])
 
 nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
 nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count)
 
-nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
+#nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
 X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
 plt.show()
