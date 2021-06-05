@@ -21,8 +21,8 @@ for datadict in G.edges.items():
     has_flow = datadict[1]['has_flow']
     start_node=datadict[0][0]
     end_node= datadict[0][1]
-    nx.nodes(G)[start_node].update({"has_flow":has_flow})
-    nx.nodes(G)[end_node].update({"has_flow":has_flow})
+    nx.nodes(G)[start_node].update({"class":"Irrelevant","has_flow":has_flow})
+    nx.nodes(G)[end_node].update({"class":"Irrelevant","has_flow":has_flow})
 
 
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
@@ -33,7 +33,7 @@ fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges
 
 
 
-firstnode = pos_e[54]
+firstnode = pos_e[25]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create n number of "plastic" objects at x:0 ,y:0
@@ -66,7 +66,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=340
+wind_direction=40
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -114,6 +114,7 @@ pls=[]
 for p in plastics_100:
     if p.find_in_node(nodes) == None:
         pls.append(p)
+        #print(p.is_active) #= true
 
 pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
 pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
@@ -146,7 +147,7 @@ plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-
 nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
 nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count)
 
-#nx.draw_networkx_labels(X, pos_node, labels=pos_relabel)
+nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
 X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
 plt.show()
