@@ -1,8 +1,5 @@
 import math
 import networkx as nx
-from networkx.algorithms.centrality import reaching
-from networkx.drawing.layout import rescale_layout
-from networkx.generators.joint_degree_seq import _neighbor_switch
 import classes as pls
 import random
 import numpy as np
@@ -59,9 +56,9 @@ def simulation(graph,nodes,plastics,wind,drift):
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
     
     
-    
-    while len(active_plastics)>0:          # Comment/Uncomment this to run until all plastics exit the simulation
-    #for m in range(1,80):                 # Comment/Uncomment this to set specific time extention to the simulation.
+                                           # IMPORTANT!:
+    while len(active_plastics)>0:          # Comment/Uncomment this line to run until all plastics exit the simulation
+    #for m in range(1,80):                 # Comment/Uncomment this line to set specific time extention to the simulation.
         #print("We are at the ",minute, "minute.")
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))
@@ -152,5 +149,5 @@ def simulation(graph,nodes,plastics,wind,drift):
                         plastic_unit.y = plastic_unit.velocity*math.sin(plastic_unit.direction)+y0
         
         #At this specific moment we assume that "m" minutes have passed.
-        print(m, "minutes have passed")
+        #print(m, "minutes have passed")
     return None

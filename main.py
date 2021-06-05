@@ -5,9 +5,39 @@ import matplotlib.patches as mpatches
 import classes as pls
 import simulation as sim
 import numpy as np
+import time
+import os
 
+def cls():
+    os.system('cls' if os.name=='nt' else 'clear')
+    print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
 
-
+print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
+while True:
+    try:
+        Wind = int(input("Insert wind direction (in degrees): "))
+        assert 0 <= Wind <= 359 
+    except ValueError:
+        cls()
+        print("This is not a valid number. Try again.")
+    except:
+        cls()
+        print("Direction should be in degrees (0-359). Try again.")
+    else: 
+        while True:    
+            try:
+                Amount = int(input("Insert amount of plastic units: "))
+                assert 1 <= Amount <= 1000 
+            except ValueError:
+                cls()
+                print("This is not a valid number. Try again.")
+            except:
+                cls()
+                print("Too large or small amount (1-1000). Try again")
+            else:
+                break
+        break
+start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
 edges_path = "./Data/delft_waterlines.shp"
@@ -30,7 +60,7 @@ pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
 pos_e2 = {v:v for k,v in enumerate(G.nodes())}
 
-fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges,nodes)
+#fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges,nodes)
 
 
 
@@ -38,7 +68,7 @@ firstnode = pos_e[25]
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create n number of "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(300)
+plastics_100 = pls.create_plastics(Amount)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -67,7 +97,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=40
+wind_direction=Wind
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -155,12 +185,14 @@ nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic
 #nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
 X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
+print("\nExecution time: "+str(round(time.perf_counter()-start_t,2))+"sec")
 plt.show()
+
 
 c=0
 for n in nodes.values():
    c+=n.has_plastics_num() 
-print("from ",len(plastics_100),",",c," plastic units are in nodes" )
+#print("from ",len(plastics_100),",",c," plastic units are in nodes" )
 
 S=nx.DiGraph()
 S.add_nodes_from(pos_pls.values()) #check documentation if it removes duplicates
@@ -174,5 +206,4 @@ for p in S.nodes.items():
 nx.write_shp(S, './Data/plastics')
 
 
-# TODO: Add node_size to plastics that are not in a node
 # TODO: Fix issue with wierd coordinate result of plastics outside of nodes.
