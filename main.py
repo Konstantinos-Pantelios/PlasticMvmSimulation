@@ -1,7 +1,6 @@
 import math
 import networkx as nx
 import matplotlib.pyplot as plt
-from numpy.lib.function_base import append
 import classes as pls
 import simulation as sim
 import numpy as np
@@ -35,11 +34,10 @@ fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges
 
 
 firstnode = pos_e[54]
-#print(firstnode)
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create n number of "plastic" objects at x:0 ,y:0
-plastics_100 = pls.create_plastics(100)
+plastics_100 = pls.create_plastics(300)
 
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
@@ -68,7 +66,7 @@ for plastic_unit in plastics_100:
 
 ##############################################
 
-wind_direction=90
+wind_direction=340
 leeway_drift=15
 
 min_x=np.min([n[0] for n in nodes.keys()])
@@ -109,6 +107,8 @@ nx.draw_networkx_edges(X, pos_e2)
 
 sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
 
+
+
 #Display network graph figure
 pls=[]
 for p in plastics_100:
@@ -118,12 +118,13 @@ for p in plastics_100:
 pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
 pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
 
+
 # pos_forelabel= []
 # for n in nodes.values(): 
 #     if n.has_plastics_num()>0: pos_forelabel.append(n)
 
 pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
+node_plastic_count = list(f*2 for f in pos_relabel.values()) # list of number of plastics at the nodes
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 
 
@@ -142,16 +143,18 @@ plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, mi
 plt.annotate("N ", xy=(min_x-70+10, min_y-80+160))
 plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-140))
 
-
+nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
 nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count)
-#nx.draw_networkx_nodes(X, pos_pls, node_color='red', node_size=5,node_shape='*')
-# nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
+
+#nx.draw_networkx_labels(X, pos_node, labels=pos_relabel)
 X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
+plt.show()
+
 c=0
 for n in nodes.values():
    c+=n.has_plastics_num() 
-print(len(plastics_100) - c," plastic units are in nodes" )
+print("from ",len(plastics_100),",",c," plastic units are in nodes" )
 
 S=nx.DiGraph()
 S.add_nodes_from(pos_pls.values()) #check documentation if it removes duplicates
@@ -164,8 +167,6 @@ for p in S.nodes.items():
 
 nx.write_shp(S, './Data/plastics')
 
-plt.show()
-print(plastics_100[0].activation_time)
 
 # TODO: Add node_size to plastics that are not in a node
 # TODO: Fix issue with wierd coordinate result of plastics outside of nodes.

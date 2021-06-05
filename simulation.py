@@ -52,40 +52,34 @@ def simulation(graph,nodes,plastics,wind,drift):
     #wind = int #in degrees fron North CW
     #drift = int #in degrees from North CW
 
-    active_pls = [p for p in plastics if p.is_active]
-    #print(active_pls)
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    for minute in range(90): # for every minute in an hour 
+    for minute in range(150):
         #print("We are at the ",minute, "minute.")
         for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
-            is_in_node = plastic_unit.find_in_node(nodes)
-            #print(is_in_node)
+            is_in_node = plastic_unit.find_in_node(nodes) # Plastic is in a specific node (Node object) OR is free roaming (None).
             if is_in_node:
-                node_coords = is_in_node.coords()
-                #neighbors = tuple(nx.all_neighbors(graph,node_coords)) # Tuple with all the neighbors of the current node ((x1,y1),...).
-                succ=tuple(graph.successors(node_coords))
-                pred=tuple(graph.predecessors(node_coords))
+                node_coords = is_in_node.coords()           # Coordinates of the node that the current plastic is in. 
+                succ=tuple(graph.successors(node_coords))   # Tuple containing all Succesor nodes 
+                pred=tuple(graph.predecessors(node_coords)) # Tuple containing all Predecessor nodes.
                 neighbors={s:"S"for s in succ}
-                neighbors.update({p:"P" for p in pred})
+                neighbors.update({p:"P" for p in pred})     # Dictionary containing both Successor and Predecessor nodes {(x0,y0):"S",...}
                 
-
-                for neigh in neighbors.keys():
+                for neigh in neighbors.keys():      # Checking all neighbors ( both Predecessors and Successors)
                     #print("we are at neighbor:", nodes[neigh])
-                    #print(neighbors.keys())
-                    pred_succ = neighbors[neigh]
-                    vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed)
+                    pred_succ = neighbors[neigh]    # Value ("S" or "P") containg current neighbor (Predecessor or Successor) 
                     
+                    vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed) #Vectorize the wind by its direction, velocity and current node origin point
 
-                    if graph.nodes[neigh]['has_flow']:    
-                        if pred_succ == "S":
+                    if graph.nodes[neigh]['has_flow']:  # Precessors and Successor nodes are only relevant if there exist meaningfull directional information      
+                        if pred_succ == "S":            # Successor node vector needs to be vectorized as an edge starting from current node and pointing to Successor node
                             vector_edge = vectorize_bycoords(node_coords,neigh)
                             edge_dir = math.atan2(vector_edge[1],vector_edge[0]) 
                             vector_flow = vectorize_byangle(edge_dir,node_coords,plastic_unit.flow_speed)
                             vector_forces = np.add(vector_wind,vector_flow) # On water"lines" that have flow direction and thus velocity we use the combined forces
                             relative_angle = relative_angle_wind(vector_edge,vector_forces)
-                        elif pred_succ == "P":
+                        elif pred_succ == "P":          # Predecessor node vector needs to be vectorized as an edge starting from Predecessor node and pointing to current node. 
                             vector_edge = vectorize_bycoords(neigh,node_coords)
                             edge_dir = math.atan2(vector_edge[1],vector_edge[0]) 
                             vector_flow = vectorize_byangle(edge_dir,node_coords,plastic_unit.flow_speed)
@@ -104,29 +98,33 @@ def simulation(graph,nodes,plastics,wind,drift):
                     
                     distance = math.dist(node_coords,neigh)
     
-                    chance = random.randint(1,100)
-                    wind_flow = forces_prob(relative_angle)
-                    decision = wind_flow
-                    print(neigh,decision,relative_angle,edge_dir,vector_forces)
+
+#################### Decision making #######################################    
+                    chance = random.randint(1,100)  # Rolling the 100-sided dice
+                    wind_flow = forces_prob(relative_angle) # Probability based on the relative angle between the forces acting upon plastics and the canal direction
+                    decision = wind_flow # Overall probaility of the plastic moving towards neighboring node or staying apeak
+                    
                     if chance <= decision:
-                        move(plastic_unit, edge_dir, distance, is_in_node, neigh)
+                        move(plastic_unit, edge_dir, distance, is_in_node, nodes[neigh]) # Plastics moves towards neighboring node
                         break
-                    if decision<=0:
+                    if decision<=0: # Plastic stays on current node.
                         continue
+#############################################################################
             else: 
                 
-                plastic_unit.dist_to_node -= plastic_unit.velocity 
-                
-                if plastic_unit.dist_to_node <= 1:
-                    nodes[plastic_unit.going_to].insert_plastic(plastic_unit)
-                    
-                    plastic_unit.x=plastic_unit.going_to[0]
-                    plastic_unit.y=plastic_unit.going_to[1]
+                if plastic_unit.dist_to_node <= 1: # Plastic has reached or almost reached its destination 
+                    # plastic_unit.x=plastic_unit.going_to[0]
+                    # plastic_unit.y=plastic_unit.going_to[1]
+                    # Updating the coordinates happens in "insert_plastic" method.
+                    plastic_unit.going_to.insert_plastic(plastic_unit)
+
                 else:
-                    x0=plastic_unit.x
-                    y0=plastic_unit.y
-                    plastic_unit.x = plastic_unit.velocity*math.cos(plastic_unit.direction)+x0
-                    plastic_unit.y = plastic_unit.velocity*math.sin(plastic_unit.direction)+y0
-            #print(plastic_unit.dist_to_node, plastic_unit.velocity)
+                    plastic_unit.dist_to_node -= plastic_unit.velocity
+                    if not plastic_unit.dist_to_node <= 1: # Plastic HASN'T reached its destination
+                        # Update plastic position based on its current position, its velocity and the direction of the canal on which it floats.
+                        x0=plastic_unit.x
+                        y0=plastic_unit.y
+                        plastic_unit.x = plastic_unit.velocity*math.cos(plastic_unit.direction)+x0
+                        plastic_unit.y = plastic_unit.velocity*math.sin(plastic_unit.direction)+y0
     
     return None
