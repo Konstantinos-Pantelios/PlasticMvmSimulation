@@ -1,5 +1,7 @@
 import math
 import networkx as nx
+from networkx.algorithms.centrality import reaching
+from networkx.drawing.layout import rescale_layout
 import classes as pls
 import random
 import numpy as np
@@ -28,13 +30,15 @@ def move(plastic_obj,direction,distance,node,neighbor):
     plastic_obj.prev_visit = node
 
 def forces_prob(relative_angle):
-    if relative_angle>=0 and relative_angle<=20:
+    if 0 <= relative_angle <= 10:
+        return 100
+    elif 10 < relative_angle <= 20:
         return 95
-    elif relative_angle>20 and relative_angle <=45:
+    elif 20 < relative_angle <=45:
         return 60
-    elif relative_angle>45 and relative_angle <=80:
+    elif 45 < relative_angle <=80:
         return 45   
-    elif relative_angle>80 and relative_angle <=90:
+    elif 80 < relative_angle <=90:
         return 20
     else: return 0
 
@@ -52,13 +56,11 @@ def simulation(graph,nodes,plastics,wind,drift):
     #print(active_pls)
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    while len(active_pls)>0: # for every minute in an hour 
-        print(active_pls)
+    for minute in range(90): # for every minute in an hour 
         #print("We are at the ",minute, "minute.")
-        for plastic_unit in active_pls: #for every plastic unit
+        for plastic_unit in plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
             is_in_node = plastic_unit.find_in_node(nodes)
-            plastic_unit.activation_time+=1
             #print(is_in_node)
             if is_in_node:
                 node_coords = is_in_node.coords()
@@ -71,6 +73,7 @@ def simulation(graph,nodes,plastics,wind,drift):
 
                 for neigh in neighbors.keys():
                     #print("we are at neighbor:", nodes[neigh])
+                    #print(neighbors.keys())
                     pred_succ = neighbors[neigh]
                     vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed)
                     
@@ -104,12 +107,12 @@ def simulation(graph,nodes,plastics,wind,drift):
                     chance = random.randint(1,100)
                     wind_flow = forces_prob(relative_angle)
                     decision = wind_flow
+                    print(neigh,decision,relative_angle,edge_dir,vector_forces)
                     if chance <= decision:
                         move(plastic_unit, edge_dir, distance, is_in_node, neigh)
+                        break
                     if decision<=0:
-                        plastic_unit.is_active = False 
-                    break
-                    
+                        continue
             else: 
                 
                 plastic_unit.dist_to_node -= plastic_unit.velocity 
@@ -124,6 +127,6 @@ def simulation(graph,nodes,plastics,wind,drift):
                     y0=plastic_unit.y
                     plastic_unit.x = plastic_unit.velocity*math.cos(plastic_unit.direction)+x0
                     plastic_unit.y = plastic_unit.velocity*math.sin(plastic_unit.direction)+y0
-        active_pls = [p for p in plastics if p.is_active]
+            #print(plastic_unit.dist_to_node, plastic_unit.velocity)
     
     return None
