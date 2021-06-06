@@ -1,6 +1,4 @@
 import math
-import networkx as nx
-import classes as pls
 import random
 import numpy as np
 def vectorize_byangle(angle, p, magnitude):

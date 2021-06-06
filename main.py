@@ -180,7 +180,7 @@ pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
 #     if n.has_plastics_num()>0: pos_forelabel.append(n)
 
 pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-node_plastic_count = list(f*2 for f in pos_relabel.values()) # list of number of plastics at the nodes
+node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 
 
