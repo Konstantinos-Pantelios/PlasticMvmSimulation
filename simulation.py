@@ -22,8 +22,8 @@ def move(plastic_obj,direction,distance,node,neighbor):
     plastic_obj.dist_to_node=distance-plastic_obj.velocity
     x0=plastic_obj.x
     y0=plastic_obj.y
-    plastic_obj.x = plastic_obj.velocity*math.cos(direction)+x0 #
-    plastic_obj.y = plastic_obj.velocity*math.sin(direction)+y0 #
+    plastic_obj.x = plastic_obj.velocity*math.sin(direction)+x0 #
+    plastic_obj.y = plastic_obj.velocity*math.cos(direction)+y0 #
     plastic_obj.going_to = neighbor
     plastic_obj.direction = direction
     plastic_obj.prev_visit = node
@@ -52,19 +52,20 @@ def simulation(graph,nodes,plastics,wind,drift):
     #wind = int #in degrees fron North CW
     #drift = int #in degrees from North CW
     active_plastics = [p for p in plastics if p.is_active]
-    m=0
+
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
-    
     
                                            # IMPORTANT!:
     while len(active_plastics)>0:          # Comment/Uncomment this line to run until all plastics exit the simulation
     #for m in range(1,80):                 # Comment/Uncomment this line to set specific time extention to the simulation.
         #print("We are at the ",minute, "minute.")
+        print(active_plastics[0].activation_time, "minutes have passed")
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))
         for plastic_unit in active_plastics: #for every plastic unit
             #print("We are at plastic:",plastic_unit)
             plastic_unit.activation_time+=1
+            
             is_in_node = plastic_unit.find_in_node(nodes) # Plastic is in a specific node (Node object) OR is free roaming (None).
             if is_in_node:
                 node_coords = is_in_node.coords()           # Coordinates of the node that the current plastic is in. 
@@ -145,8 +146,8 @@ def simulation(graph,nodes,plastics,wind,drift):
                         # Update plastic position based on its current position, its velocity and the direction of the canal on which it floats.
                         x0=plastic_unit.x
                         y0=plastic_unit.y
-                        plastic_unit.x = plastic_unit.velocity*math.cos(plastic_unit.direction)+x0
-                        plastic_unit.y = plastic_unit.velocity*math.sin(plastic_unit.direction)+y0
+                        plastic_unit.x = plastic_unit.velocity*math.sin(plastic_unit.direction)+x0
+                        plastic_unit.y = plastic_unit.velocity*math.cos(plastic_unit.direction)+y0
         
         #At this specific moment we assume that "m" minutes have passed.
         #print(m, "minutes have passed")
