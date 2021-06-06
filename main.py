@@ -12,31 +12,36 @@ def cls():
     os.system('cls' if os.name=='nt' else 'clear')
     print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
 
-print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
-while True:
-    try:
-        Wind = int(input("Insert wind direction (in degrees): "))
-        assert 0 <= Wind <= 359 
-    except ValueError:
-        cls()
-        print("This is not a valid number. Try again.")
-    except:
-        cls()
-        print("Direction should be in degrees (0-359). Try again.")
-    else: 
-        while True:    
-            try:
-                Amount = int(input("Insert amount of plastic units: "))
-                assert 1 <= Amount <= 1000 
-            except ValueError:
-                cls()
-                print("This is not a valid number. Try again.")
-            except:
-                cls()
-                print("Too large or small amount (1-1000). Try again")
-            else:
-                break
-        break
+def params():
+    print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
+    while True:
+        try:
+            Wind = int(input("Insert wind direction (in degrees): "))
+            assert 0 <= Wind <= 359 
+        except ValueError:
+            cls()
+            print("This is not a valid number. Try again.")
+        except:
+            cls()
+            print("Direction should be in degrees (0-359). Try again.")
+        else: 
+            while True:    
+                try:
+                    Amount = int(input("Insert amount of plastic units: "))
+                    assert 1 <= Amount <= 1000 
+                except ValueError:
+                    cls()
+                    print("This is not a valid number. Try again.")
+                except:
+                    cls()
+                    print("Too large or small amount (1-1000). Try again")
+                else:
+                    break
+            return Wind,Amount
+        
+
+
+Wind, Amount = params() 
 start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
