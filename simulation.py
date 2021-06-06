@@ -1,6 +1,7 @@
 import math
 import random
 import numpy as np
+
 def vectorize_byangle(angle, p, magnitude):
     x2 = magnitude*math.sin(math.radians(angle))+p[0]
     y2 = magnitude*math.cos(math.radians(angle))+p[1]

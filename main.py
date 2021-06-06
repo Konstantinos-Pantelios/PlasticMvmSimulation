@@ -11,9 +11,14 @@ import os
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
     print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
-
+    print("|NOTES:")
+    print("|-> The simulation works by assuming a wind direction of 45 degrees (SW)")
+    print("|-> Plastiscs are being inserted into the network's nodes based on proximity to 'recreation' locations (1 to 1)"+'\n')
 def params(lever):
     print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
+    print("|NOTES:")
+    print("|-> The simulation works by assuming a wind direction of 45 degrees (SW)")
+    print("|-> Plastiscs are being inserted into the network's nodes based on proximity to 'recreation' locations (1 to 1)"+'\n')
     if lever:
         while True:
             try:
@@ -44,10 +49,8 @@ def params(lever):
         
 
 
-Wind = params(1) #Change this to 1 to allow the user to insert specific wind direction
-print("|NOTES:")
-print("|-> The simulation works by assuming a wind direction of 45 degrees (SW)")
-print("|-> Plastiscs are being inserted into the network's nodes based on proximity to 'recreation' locations (1 to 1)")
+Wind = params(1) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
+
 start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
@@ -131,9 +134,14 @@ dy_leeway = 0.09 * math.cos(math.radians(wind_direction+leeway_drift)) +0.1
 
 pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)}
 # pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
+n_list=[k for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0]
 pos_relabel =  { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
 node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
 pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
+# print(n_list)
+# print(node_plastic_count, len(node_plastic_count))
+# print(pos_relabel, len(pos_relabel))
+#print(pos_pls,len(pos_pls))
 
 X=nx.Graph()
 X.add_nodes_from(pos_pls.keys())
@@ -153,8 +161,8 @@ plt.annotate("", xy=(dx_leeway, dy_leeway), xycoords='axes fraction',xytext=(1.1
 plt.legend(handles=[blue_patch])
 
 
-nx.draw_networkx_nodes(X, pos_pls, node_size=node_plastic_count)
-nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom')
+nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
+nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
 X.add_edges_from(G.edges())
 nx.draw_networkx_edges(X, pos_e2)
 ###################################################
@@ -224,6 +232,7 @@ for p in S.nodes.items():
     a+=1
     p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')'})
 nx.write_shp(S, './Data/plastics')
+print("Potential hotspots have been exported as .shp file in './Data/plastics/nodes.shp'")
 ### -------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>> #####
 
 # TODO: Fix issue with wierd coordinate result of plastics outside of nodes.
