@@ -47,15 +47,116 @@ def params(lever):
                 return Wind
     else: return 45
         
+def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
+    ##### Parameters used for ploting the figures ################################
+    min_x=np.min([n[0] for n in nodes.keys()])
+    min_y=np.min([n[1] for n in nodes.keys()])
+    max_x=np.max([n[0] for n in nodes.keys()])
+    max_y=np.max([n[1] for n in nodes.keys()])
+    ext_x=int(max_x-min_x) # Unused
+    ext_y=int((max_y-min_y)/8) 
+    dx_wind = 0.1 * math.sin(math.radians(wind_direction))+1.1
+    dy_wind =  0.1 * math.cos(math.radians(wind_direction)) +0.1
+    dx_leeway = 0.09 * math.sin(math.radians(wind_direction+leeway_drift)) +1.1
+    dy_leeway = 0.09 * math.cos(math.radians(wind_direction+leeway_drift)) +0.1
+    #################################################################################
+
+    ########### 1. Display network graph figure at time BEFORE initiating the algorithm. ##################################
+
+    pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)}
+    # pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
+    n_list=[k for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0]
+    pos_relabel =  { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
+    node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
+    pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
+    # print(n_list)
+    # print(node_plastic_count, len(node_plastic_count))
+    # print(pos_relabel, len(pos_relabel))
+    #print(pos_pls,len(pos_pls))
+
+    X=nx.Graph()
+    X.add_nodes_from(pos_pls.keys())
+    l = [set(x) for x in G.edges()]
+    edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
+
+    plt.subplot(121)
+    blue_patch = mpatches.Patch(color='tab:blue', label="Plastics in nodes")
+    plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
+    plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(1, -0.02),xycoords='axes fraction',xytext=(1, -0.02),color='b')
+    plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees",  xy=(0, -0.04),xycoords='axes fraction',xytext=(1, -0.04),color='r',annotation_clip=False)
+    plt.annotate("N ", xy=(1.1, 0.21),xycoords='axes fraction',xytext=(1.1, 0.21))
+    plt.annotate("", xy=(1.1, 0.21), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->"),annotation_clip=False)
+    plt.annotate("", xy=(dx_wind, dy_wind), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='b'),annotation_clip=False)
+    plt.annotate("", xy=(dx_leeway, dy_leeway), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='r'),annotation_clip=False)
+
+    plt.legend(handles=[blue_patch])
 
 
-Wind = params(1) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
+    nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
+    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
+    X.add_edges_from(G.edges())
+    nx.draw_networkx_edges(X, pos_e2)
+    ###################################################
+
+def plot_end(nodes,plastics_100):
+    ######### 2. Display network graph figure AFTER the completion of the simulation #####################################
+    min_x=np.min([n[0] for n in nodes.keys()])
+    min_y=np.min([n[1] for n in nodes.keys()])
+    max_x=np.max([n[0] for n in nodes.keys()])
+    max_y=np.max([n[1] for n in nodes.keys()])
+
+    pls=[]
+    for p in plastics_100:
+        if p.find_in_node(nodes) == None:
+            pls.append(p)
+            #print(p.is_active) #= true
+
+    pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
+    pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
+
+
+    # pos_forelabel= []
+    # for n in nodes.values(): 
+    #     if n.has_plastics_num()>0: pos_forelabel.append(n)
+
+    pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
+    node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
+    pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
+
+
+    X=nx.Graph()
+    X.add_nodes_from(pos_pls.keys())
+    l = [set(x) for x in G.edges()]
+    edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
+
+
+    plt.subplot(122)
+    red_patch = mpatches.Patch(color='red', label="Plastics that haven't yet reached a particular node")
+    blue_patch = mpatches.Patch(color='red', label="Plastics in nodes")
+    # plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=ext_y, width=2,color='k' ) 
+    # plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10,color='b')
+    # plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
+    plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
+    # plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100,),color='b')
+    # plt.annotate("N ", xy=(min_x-70+10, min_y-80+560))
+    # plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-170),color='r')
+    plt.legend(handles=[blue_patch])
+
+    #nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
+    nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count,node_color='r')
+
+    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
+    X.add_edges_from(G.edges())
+    nx.draw_networkx_edges(X, pos_e2)
+
+
+Wind = params(0) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
 
 start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
 edges_path = "./Data/region_delft_waterlines.shp"
-nodes_path = "./Data/region_delft_nodes.shp"
+nodes_path = "./Data/region_delft_nodes2.shp"
 
 
 #Read the shp files 
@@ -120,106 +221,15 @@ for d in G.nodes.items():
 wind_direction=Wind
 leeway_drift=15
 
-##### Parameters used for ploting the figures ################################
-min_x=np.min([n[0] for n in nodes.keys()])
-min_y=np.min([n[1] for n in nodes.keys()])
-max_x=np.max([n[0] for n in nodes.keys()])
-max_y=np.max([n[1] for n in nodes.keys()])
-ext_x=int(max_x-min_x) # Unused
-ext_y=int((max_y-min_y)/8) 
-dx_wind = 0.1 * math.sin(math.radians(wind_direction))+1.1
-dy_wind =  0.1 * math.cos(math.radians(wind_direction)) +0.1
-dx_leeway = 0.09 * math.sin(math.radians(wind_direction+leeway_drift)) +1.1
-dy_leeway = 0.09 * math.cos(math.radians(wind_direction+leeway_drift)) +0.1
-#################################################################################
-
-########### 1. Display network graph figure at time BEFORE initiating the algorithm. ##################################
-
-pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)}
-# pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
-n_list=[k for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0]
-pos_relabel =  { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
-pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
-# print(n_list)
-# print(node_plastic_count, len(node_plastic_count))
-# print(pos_relabel, len(pos_relabel))
-#print(pos_pls,len(pos_pls))
-
-X=nx.Graph()
-X.add_nodes_from(pos_pls.keys())
-l = [set(x) for x in G.edges()]
-edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
-
-plt.subplot(121)
-blue_patch = mpatches.Patch(color='tab:blue', label="Plastics in nodes")
-plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
-plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(1, -0.02),xycoords='axes fraction',xytext=(1, -0.02),color='b')
-plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees",  xy=(0, -0.04),xycoords='axes fraction',xytext=(1, -0.04),color='r',annotation_clip=False)
-plt.annotate("N ", xy=(1.1, 0.21),xycoords='axes fraction',xytext=(1.1, 0.21))
-plt.annotate("", xy=(1.1, 0.21), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->"),annotation_clip=False)
-plt.annotate("", xy=(dx_wind, dy_wind), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='b'),annotation_clip=False)
-plt.annotate("", xy=(dx_leeway, dy_leeway), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='r'),annotation_clip=False)
-
-plt.legend(handles=[blue_patch])
-
-
-nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
-nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
-X.add_edges_from(G.edges())
-nx.draw_networkx_edges(X, pos_e2)
-###################################################
+plot_start(nodes,wind_direction,leeway_drift,plastics_100)
 
 #**** Run the simulation ****#
 sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
-
-
-
-######### 2. Display network graph figure AFTER the completion of the simulation #####################################
-pls=[]
-for p in plastics_100:
-    if p.find_in_node(nodes) == None:
-        pls.append(p)
-        #print(p.is_active) #= true
-
-pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
-pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
-
-
-# pos_forelabel= []
-# for n in nodes.values(): 
-#     if n.has_plastics_num()>0: pos_forelabel.append(n)
-
-pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
-node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
-pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
-
-
-X=nx.Graph()
-X.add_nodes_from(pos_pls.keys())
-l = [set(x) for x in G.edges()]
-edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
-
-
-plt.subplot(122)
-red_patch = mpatches.Patch(color='red', label="Plastics that haven't yet reached a particular node")
-# plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=ext_y, width=2,color='k' ) 
-# plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10,color='b')
-# plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
-plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
-# plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100,),color='b')
-# plt.annotate("N ", xy=(min_x-70+10, min_y-80+560))
-# plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-170),color='r')
-plt.legend(handles=[blue_patch])
-
-nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
-nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count)
-
-nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
-X.add_edges_from(G.edges())
-nx.draw_networkx_edges(X, pos_e2)
-print("\nExecution time: "+str(round(time.perf_counter()-start_t,2))+"sec")
+plot_end(nodes,plastics_100)
 plt.show()
+
+print("\nExecution time: "+str(round(time.perf_counter()-start_t,2))+"sec")
+
 #############################################################
 
 # c=0
@@ -228,6 +238,7 @@ plt.show()
 #print("from ",len(plastics_100),",",c," plastic units are in nodes" )
 
 ### ------->>>>> Export the results into a .shp file into the ./Data/plastics directory. -------->>>>> #####
+pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
 S=nx.DiGraph()
 S.add_nodes_from(pos_pls.values()) #check documentation if it removes duplicates
 a=0

@@ -1,6 +1,8 @@
 import math
 import random
 import numpy as np
+#import main
+import matplotlib.pyplot as plt
 
 def vectorize_byangle(angle, p, magnitude):
     x2 = magnitude*math.sin(math.radians(angle))+p[0]
@@ -59,12 +61,18 @@ def simulation(graph,nodes,plastics,wind,drift):
     #for m in range(1,80):                 # Comment/Uncomment this line to set specific time extention to the simulation.
         #print("We are at the ",minute, "minute.")
         print(active_plastics[0].activation_time, "minutes have passed")
+        if active_plastics[0].activation_time%25 == 0:
+            pass
+            # main.plot_end(nodes,plastics)
+            # plt.show()
+
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))
         for plastic_unit in active_plastics: #for every plastic unit
 
             #print("We are at plastic:",plastic_unit)
             plastic_unit.activation_time+=1
+            
             
             is_in_node = plastic_unit.find_in_node(nodes) # Plastic is in a specific node (Node object) OR is free roaming (None).
             if is_in_node:
@@ -120,7 +128,13 @@ def simulation(graph,nodes,plastics,wind,drift):
 
 #################### Decision making #######################################    
                     chance = random.randint(1,100)  # Rolling the 100-sided dice
-                    wind_flow = forces_prob(relative_angle) # Probability based on the relative angle between the forces acting upon plastics and the canal direction
+                    
+                    # Probability based on the relative angle between the forces acting upon plastics and the canal direction
+                    wind_flow = forces_prob(relative_angle) 
+                    
+                    # Probability based on hard_turn 
+                         
+                    
                     decision = wind_flow # Overall probaility of the plastic moving towards neighboring node or staying apeak
                     
                     if chance <= decision:
