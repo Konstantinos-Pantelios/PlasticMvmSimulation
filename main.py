@@ -55,7 +55,7 @@ start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
 edges_path = "./Data/region_delft_waterlines.shp"
-nodes_path = "./Data/region_delft_nodes2.shp"
+nodes_path = "./Data/region_delft_nodes.shp"
 
 
 #Read the shp files 
@@ -88,9 +88,11 @@ for node in N.nodes.items():
 plastics_100 = pls.create_plastics(n)
 plastics_to_pour = plastics_100.copy() # temporary layer used to pour all the plastic created above to the nodes depending on the latter's proximity to recreation locations.
 
+
 #Create n "node" objects. n = G.number_of_nodes() 
 nodes = {}
 relevant_nodes= {k[0]:k[1] for k in N.nodes.items()} #Dictionary {(x1,y1):{filed1:value1,field11:value11,..},..}
+z=0
 for d in G.nodes.items():
     if d[0] in relevant_nodes.keys():
         identification = relevant_nodes[d[0]]["id"]
@@ -100,6 +102,7 @@ for d in G.nodes.items():
         nodes[d[0]]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate decision making node object inside a dictionary {(x1,y1):<node_object>,..}
         for k in range(int(relevant_nodes[d[0]]["pls_amount"])):
             nodes[d[0]].insert_plastic(plastics_to_pour.pop(-1))
+            z+=1
     else:
         identification = str(list(pos_e.keys())[list(pos_e.values()).index(d[0])])
         x_coord = d[0][0]

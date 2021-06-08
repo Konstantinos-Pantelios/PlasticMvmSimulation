@@ -62,6 +62,7 @@ def simulation(graph,nodes,plastics,wind,drift):
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))
         for plastic_unit in active_plastics: #for every plastic unit
+
             #print("We are at plastic:",plastic_unit)
             plastic_unit.activation_time+=1
             
@@ -137,6 +138,7 @@ def simulation(graph,nodes,plastics,wind,drift):
                     # plastic_unit.x=plastic_unit.going_to[0]
                     # plastic_unit.y=plastic_unit.going_to[1]
                     # Updating the coordinates happens in "insert_plastic" method.
+                    
                     plastic_unit.going_to.insert_plastic(plastic_unit)
 
                 else:
