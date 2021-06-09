@@ -52,6 +52,8 @@ def simulation(graph,nodes,plastics,wind,drift):
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
     #wind = int #in degrees fron North CW
     #drift = int #in degrees from North CW
+    # for g in graph.nodes.items():
+    #     print(g[1],nodes[g[0]].has_plastics_num())
     active_plastics = [p for p in plastics if p.is_active]
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
@@ -96,8 +98,8 @@ def simulation(graph,nodes,plastics,wind,drift):
                     pred_succ = neighbors[neigh]    # Value ("S" or "P") containg current neighbor (Predecessor or Successor) 
                     
                     vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed) #Vectorize the wind by its direction, velocity and current node origin point
-
-                    if graph.nodes[neigh]['has_flow']:  # Precessors and Successor nodes are only relevant if there exist meaningfull directional information      
+                    
+                    if graph.nodes[neigh]['has_flow'] == 'true':  # Precessors and Successor nodes are only relevant if there exist meaningfull directional information      
                         if pred_succ == "S":            # Successor node vector needs to be vectorized as an edge starting from current node and pointing to Successor node
                             vector_edge = vectorize_bycoords(node_coords,neigh) 
                             edge_dir = math.atan2(vector_edge[1],vector_edge[0]) 
@@ -113,16 +115,18 @@ def simulation(graph,nodes,plastics,wind,drift):
                             relative_angle = relative_angle_wind(vector_edge,vector_forces)
                         else:
                             print("Other value than S or P")
+                        #print("combined")
                   
                     else: 
+
                         vector_edge = vectorize_bycoords(node_coords,neigh)
                         vector_forces = vector_wind # On water"lines" that have NO flow direction we only account for the wind acting upon the plastics
                         edge_dir = math.atan2(vector_edge[1],vector_edge[0])
                         relative_angle = relative_angle_wind(vector_edge,vector_forces)
-
+                    #print("VECTOR FORCES",vector_forces)
                     
                     plastic_unit.velocity=np.linalg.norm(vector_forces) # Calculate velocity based on the combined forces vector
-                    
+                    #print(plastic_unit.velocity)
                     distance = math.dist(node_coords,neigh) # EU Distance betwwen current and neighbor nodes.
     
 

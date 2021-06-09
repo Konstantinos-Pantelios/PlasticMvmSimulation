@@ -171,6 +171,7 @@ for datadict in G.edges.items():
     nx.nodes(G)[end_node].update({"class":"Irrelevant","has_flow":has_flow})
 
 
+
 pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
 pos_e2 = {v:v for v in G.nodes()}
@@ -205,6 +206,7 @@ for d in G.nodes.items():
             nodes[d[0]].insert_plastic(plastics_to_pour.pop(-1))
             z+=1
     else:
+        
         identification = str(list(pos_e.keys())[list(pos_e.values()).index(d[0])])
         x_coord = d[0][0]
         y_coord = d[0][1]
