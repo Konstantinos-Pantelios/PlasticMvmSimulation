@@ -156,7 +156,7 @@ start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
 edges_path = "./Data/region_delft_waterlines.shp"
-nodes_path = "./Data/region_delft_nodes2.shp"
+nodes_path = "./Data/region_delft_nodes.shp"
 
 
 #Read the shp files 

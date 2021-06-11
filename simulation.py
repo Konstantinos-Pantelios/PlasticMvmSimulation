@@ -5,8 +5,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def vectorize_byangle(angle, p, magnitude):
-    x2 = magnitude*math.sin(math.radians(angle))+p[0]
-    y2 = magnitude*math.cos(math.radians(angle))+p[1]
+    x2 = magnitude*math.sin(angle)+p[0]
+    y2 = magnitude*math.cos(angle)+p[1]
     return np.subtract((x2,y2), p)
 
 def vectorize_bycoords(p1, p2):
@@ -17,6 +17,7 @@ def relative_angle_wind(edge,forces):
 
     norm = edge/np.linalg.norm(edge)
     return math.degrees(math.atan2(np.linalg.norm(np.cross(forces,norm)), np.dot(forces,norm)))
+
 
 def move(plastic_obj,direction,distance,node,neighbor):
     node.remove_plastic(plastic_obj)
@@ -97,7 +98,7 @@ def simulation(graph,nodes,plastics,wind,drift):
                     #print("we are at neighbor:", nodes[neigh])
                     pred_succ = neighbors[neigh]    # Value ("S" or "P") containg current neighbor (Predecessor or Successor) 
                     
-                    vector_wind = vectorize_byangle(wind_angle,node_coords,plastic_unit.wind_speed) #Vectorize the wind by its direction, velocity and current node origin point
+                    vector_wind = vectorize_byangle(math.radians(wind_angle),node_coords,plastic_unit.wind_speed) #Vectorize the wind by its direction, velocity and current node origin point
                     
                     if graph.nodes[neigh]['has_flow'] == 'true':  # Precessors and Successor nodes are only relevant if there exist meaningfull directional information      
                         if pred_succ == "S":            # Successor node vector needs to be vectorized as an edge starting from current node and pointing to Successor node
