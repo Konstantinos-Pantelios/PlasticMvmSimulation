@@ -64,10 +64,10 @@ def simulation(graph,nodes,plastics,wind,drift):
     #for m in range(1,80):                 # Comment/Uncomment this line to set specific time extention to the simulation.
         #print("We are at the ",minute, "minute.")
         print(active_plastics[0].activation_time, "minutes have passed")
-        if active_plastics[0].activation_time%25 == 0:
+        if active_plastics[0].activation_time%1 == 0:
             pass
-            # main.plot_end(nodes,plastics)
-            # plt.show()
+            #main.plot_end(nodes,plastics)
+            #plt.show()
 
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))

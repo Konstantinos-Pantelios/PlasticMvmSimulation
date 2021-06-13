@@ -93,7 +93,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
 
 
     nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
-    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
+    #nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
     X.add_edges_from(G.edges())
     nx.draw_networkx_edges(X, pos_e2)
     ###################################################
@@ -246,7 +246,7 @@ S.add_nodes_from(pos_pls.values()) #check documentation if it removes duplicates
 a=0
 for p in S.nodes.items():
     a+=1
-    p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')'})
+    p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')','ID': nodes[p[0]].id,'pls_amount':nodes[p[0]].has_plastics_num()})
 nx.write_shp(S, './Data/plastics')
 print("Potential hotspots have been exported as .shp file in './Data/plastics/nodes.shp'")
 ### -------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>> #####
