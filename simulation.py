@@ -32,15 +32,15 @@ def move(plastic_obj,direction,distance,node,neighbor):
 
 def forces_prob(relative_angle):
     if 0 <= relative_angle <= 10:
-        return 100
-    elif 10 < relative_angle <= 20:
         return 95
+    elif 10 < relative_angle <= 20:
+        return 80
     elif 20 < relative_angle <=45:
-        return 60
+        return 50
     elif 45 < relative_angle <=80:
-        return 45   
+        return 20   
     elif 80 < relative_angle <=90:
-        return 20
+        return 5
     else: return 0
 
 

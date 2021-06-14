@@ -150,7 +150,7 @@ def plot_end(nodes,plastics_100):
     nx.draw_networkx_edges(X, pos_e2)
 
 
-Wind = params(0) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
+Wind = params(1) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
 
 start_t=time.perf_counter() #initiate timer
 
@@ -247,8 +247,8 @@ a=0
 for p in S.nodes.items():
     a+=1
     p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')','ID': nodes[p[0]].id,'pls_amount':nodes[p[0]].has_plastics_num()})
-nx.write_shp(S, './Data/plastics')
-print("Potential hotspots have been exported as .shp file in './Data/plastics/nodes.shp'")
+nx.write_shp(S, './Data/plastics/60_conf2_5.shp')
+print("Potential hotspots have been exported as .shp file in './Data/plastics/60_conf2_5.shp'")
 ### -------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>> #####
 
 # TODO: Fix issue with wierd coordinate result of plastics outside of nodes.
