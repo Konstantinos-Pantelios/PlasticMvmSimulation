@@ -5,7 +5,8 @@ This repository is created for the purposes of GEO1101 synthesis project from TU
 The algorithm aims to model the movement of plastic objects using an agent-based approach with Object-Orientated programming in Python. However, due to the fact that it is modelling inanimate objects without clear interactivity between them, we assume that the agents are isolated from each other and are being affected individually only by their environment.
 
 ## Limitations
-- The algorithm was developed having in mind the urban environment of South-Holland provice of the Netherlands and in particular the city of Delft area. ![City of Delft](https://www.google.com/maps/vt/data=9DSKHP38T__S9MAEQKeSlOCx5me129gsIymgTraM3w03AWQKcEJbKH1_CTmigIYVkxL1dwmQpDIFmEblLHLODxLZW-PpQTH8J11N1i6s0XB9KTd5R-7wXRuDGXSqC7uDkAfWywm_-Of8MweWAYa94d2G6jMNoqbas8Te6rwZipjETwSQgwcWuPHSLrnBTy1MOKUXvQB8r_d3xHA5ybUhmwusnfg5oDh2gsxQjvcRL1AoU18)
+- The algorithm was developed having in mind the urban environment of South-Holland provice of the Netherlands and in particular the city of Delft area.
+![City of Delft](https://www.google.com/maps/vt/data=9DSKHP38T__S9MAEQKeSlOCx5me129gsIymgTraM3w03AWQKcEJbKH1_CTmigIYVkxL1dwmQpDIFmEblLHLODxLZW-PpQTH8J11N1i6s0XB9KTd5R-7wXRuDGXSqC7uDkAfWywm_-Of8MweWAYa94d2G6jMNoqbas8Te6rwZipjETwSQgwcWuPHSLrnBTy1MOKUXvQB8r_d3xHA5ybUhmwusnfg5oDh2gsxQjvcRL1AoU18)
 
 - The code is not dynamic in the sense that users need to manually change directory path of input or output to their liking.
 - The code us heavily dependent on the input dataset format.
