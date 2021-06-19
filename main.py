@@ -77,7 +77,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
 
 
     nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
-    #nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
+    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom') 
     X.add_edges_from(G.edges())
     nx.draw_networkx_edges(X, pos_e2)
     ###################################################
@@ -120,7 +120,7 @@ def plot_end(nodes,plastics_100):
     #nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
     nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count,node_color='r')
 
-   # nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
+    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
     X.add_edges_from(G.edges())
     nx.draw_networkx_edges(X, pos_e2)
 
