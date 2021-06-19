@@ -32,42 +32,42 @@ def move(plastic_obj,direction,distance,node,neighbor):
 
 def forces_prob(relative_angle):
     if 0 <= relative_angle <= 10:
-        return 95
+        return 100
     elif 10 < relative_angle <= 20:
-        return 80
+        return 95
     elif 20 < relative_angle <=45:
-        return 50
+        return 60
     elif 45 < relative_angle <=80:
-        return 20   
+        return 45   
     elif 80 < relative_angle <=90:
-        return 5
+        return 20
     else: return 0
 
 
 def simulation(graph,nodes,plastics,wind,drift):
     
-    #plastics = [pls_object1, pls_object2,...]
     #nodes = {(x1,y1):pls_object1, (x2,y2):node_object2} Both relevant and irrelevant
     #graph = Graph
     #graph.nodes(data=True) = [((x1,y1),{}),((x2,y2),{}),...]
     #graph.edges(data=True) = [((x_start,y_start),(x_end,y_end),{.......}),....]
+    #plastics = [pls_object1, pls_object2,...]
     #wind = int #in degrees fron North CW
     #drift = int #in degrees from North CW
-    # for g in graph.nodes.items():
-    #     print(g[1],nodes[g[0]].has_plastics_num())
+
+
     active_plastics = [p for p in plastics if p.is_active]
 
     wind_angle = wind+drift # +degrees based on rule-of-thumb (literature)
     
                                            # IMPORTANT!:
     while len(active_plastics)>0:          # Comment/Uncomment this line to run until all plastics exit the simulation
-    #for m in range(1,80):                 # Comment/Uncomment this line to set specific time extention to the simulation.
+    #for m in range(1,80):                 # Comment/Uncomment this line to set specific time extention to the simulation. NOTE: Might need some modification in order to write the output successfuly.
         #print("We are at the ",minute, "minute.")
         print(active_plastics[0].activation_time, "minutes have passed")
-        if active_plastics[0].activation_time%1 == 0:
-            pass
-            #main.plot_end(nodes,plastics)
-            #plt.show()
+        # if active_plastics[0].activation_time%1 == 0:
+        #     pass
+        #     #main.plot_end(nodes,plastics)
+        #     #plt.show()
 
         active_plastics = [p for p in plastics if p.is_active]
         #print(len(active_plastics))
@@ -116,7 +116,7 @@ def simulation(graph,nodes,plastics,wind,drift):
                             relative_angle = relative_angle_wind(vector_edge,vector_forces)
                         else:
                             print("Other value than S or P")
-                        #print("combined")
+
                   
                     else: 
 
@@ -124,10 +124,9 @@ def simulation(graph,nodes,plastics,wind,drift):
                         vector_forces = vector_wind # On water"lines" that have NO flow direction we only account for the wind acting upon the plastics
                         edge_dir = math.atan2(vector_edge[1],vector_edge[0])
                         relative_angle = relative_angle_wind(vector_edge,vector_forces)
-                    #print("VECTOR FORCES",vector_forces)
+
                     
                     plastic_unit.velocity=np.linalg.norm(vector_forces) # Calculate velocity based on the combined forces vector
-                    #print(plastic_unit.velocity)
                     distance = math.dist(node_coords,neigh) # EU Distance betwwen current and neighbor nodes.
     
 
@@ -137,9 +136,7 @@ def simulation(graph,nodes,plastics,wind,drift):
                     # Probability based on the relative angle between the forces acting upon plastics and the canal direction
                     wind_flow = forces_prob(relative_angle) 
                     
-                    # Probability based on hard_turn 
-                         
-                    
+                    # Probability based on hard_turn               
                     decision = wind_flow # Overall probaility of the plastic moving towards neighboring node or staying apeak
                     
                     if chance <= decision:
@@ -169,6 +166,4 @@ def simulation(graph,nodes,plastics,wind,drift):
                         plastic_unit.x = plastic_unit.velocity*math.sin(plastic_unit.direction)+x0
                         plastic_unit.y = plastic_unit.velocity*math.cos(plastic_unit.direction)+y0
         
-        #At this specific moment we assume that "m" minutes have passed.
-        #print(m, "minutes have passed")
     return None

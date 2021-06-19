@@ -32,19 +32,6 @@ def params(lever):
                 print("Direction should be in degrees (0-359). Try again.")
             else: 
                 return Wind
-                while True:    
-                    try:
-                        Amount = int(input("Insert amount of plastic units: "))
-                        assert 1 <= Amount <= 1000 
-                    except ValueError:
-                        cls()
-                        print("This is not a valid number. Try again.")
-                    except:
-                        cls()
-                        print("Too large or small amount (1-1000). Try again")
-                    else:
-                        break
-                return Wind
     else: return 45
         
 def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
@@ -93,7 +80,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
 
 
     nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
-    #nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
+    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
     X.add_edges_from(G.edges())
     nx.draw_networkx_edges(X, pos_e2)
     ###################################################
@@ -109,15 +96,10 @@ def plot_end(nodes,plastics_100):
     for p in plastics_100:
         if p.find_in_node(nodes) == None:
             pls.append(p)
-            #print(p.is_active) #= true
+
 
     pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
     pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
-
-
-    # pos_forelabel= []
-    # for n in nodes.values(): 
-    #     if n.has_plastics_num()>0: pos_forelabel.append(n)
 
     pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
     node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
@@ -133,13 +115,9 @@ def plot_end(nodes,plastics_100):
     plt.subplot(122)
     red_patch = mpatches.Patch(color='red', label="Plastics that haven't yet reached a particular node")
     blue_patch = mpatches.Patch(color='red', label="Plastics in nodes")
-    # plt.arrow(x=min_x-70, y=min_y-80, dx=0, dy=ext_y, width=2,color='k' ) 
-    # plt.arrow(x=min_x-70, y=min_y-80, dx=dx_wind, dy=dy_wind, width=10,color='b')
-    # plt.arrow(x=min_x-70, y=min_y-80, dx=dx_leeway, dy=dy_leeway, width=5,color='r')
+
     plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
-    # plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(min_x+40, min_y-100,),color='b')
-    # plt.annotate("N ", xy=(min_x-70+10, min_y-80+560))
-    # plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees", xy=(min_x+40, min_y-170),color='r')
+
     plt.legend(handles=[blue_patch])
 
     #nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
@@ -155,7 +133,7 @@ Wind = params(1) #Change this to 1 to allow the user to insert specific wind dir
 start_t=time.perf_counter() #initiate timer
 
 #Define the local path of the shapefile  
-edges_path = "./Data/region_delft_waterlines.shp"
+edges_path = "./Data/delft_waterlines.shp"
 nodes_path = "./Data/region_delft_nodes.shp"
 
 
@@ -177,7 +155,6 @@ pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes
 pos_e2 = {v:v for v in G.nodes()}
 
 #fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges,nodes)
-
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create n number of "plastic" objects at x:0 ,y:0
@@ -227,6 +204,8 @@ plot_start(nodes,wind_direction,leeway_drift,plastics_100)
 
 #**** Run the simulation ****#
 sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
+#****************************#
+
 plot_end(nodes,plastics_100)
 plt.show()
 
@@ -234,21 +213,19 @@ print("\nExecution time: "+str(round(time.perf_counter()-start_t,2))+"sec")
 
 #############################################################
 
-# c=0
-# for n in nodes.values():
-#    c+=n.has_plastics_num() 
-#print("from ",len(plastics_100),",",c," plastic units are in nodes" )
-
 ### ------->>>>> Export the results into a .shp file into the ./Data/plastics directory. -------->>>>> #####
 pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
 S=nx.DiGraph()
-S.add_nodes_from(pos_pls.values()) #check documentation if it removes duplicates
+S.add_nodes_from(pos_pls.values())
 a=0
 for p in S.nodes.items():
     a+=1
-    p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')','ID': nodes[p[0]].id,'pls_amount':nodes[p[0]].has_plastics_num()})
-nx.write_shp(S, './Data/plastics/60_conf2_5.shp')
-print("Potential hotspots have been exported as .shp file in './Data/plastics/60_conf2_5.shp'")
+    p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')','ID': nodes[p[0]].id,'pls_amount':nodes[p[0]].has_plastics_num(),'class': nodes[p[0]].fields["class"]})
+
+path = './Data/plastics/hotspots.shp' # Modify this line to either change the name of the output or change the path.
+
+nx.write_shp(S, path)
+print("Potential hotspots have been exported as .shp file in "+path)
 ### -------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>> #####
 
-# TODO: Fix issue with wierd coordinate result of plastics outside of nodes.
+# TODO: Fix issue with wierd coordinate results of plastics outside of nodes.
