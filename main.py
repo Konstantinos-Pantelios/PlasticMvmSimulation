@@ -56,10 +56,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
     pos_relabel =  { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
     node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
     pos_node ={k:v.coords() for k,v in enumerate(nodes.values())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
-    # print(n_list)
-    # print(node_plastic_count, len(node_plastic_count))
-    # print(pos_relabel, len(pos_relabel))
-    #print(pos_pls,len(pos_pls))
+
 
     X=nx.Graph()
     X.add_nodes_from(pos_pls.keys())
@@ -80,7 +77,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
 
 
     nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
-    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
+    #nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom',)
     X.add_edges_from(G.edges())
     nx.draw_networkx_edges(X, pos_e2)
     ###################################################
@@ -123,7 +120,7 @@ def plot_end(nodes,plastics_100):
     #nx.draw_networkx_nodes(X, pos_pls, nodelist=pos_pls_re, node_color='red', node_size=2,node_shape='*')
     nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count,node_color='r')
 
-    nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
+   # nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
     X.add_edges_from(G.edges())
     nx.draw_networkx_edges(X, pos_e2)
 
