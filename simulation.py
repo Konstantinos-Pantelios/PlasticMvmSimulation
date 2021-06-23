@@ -1,6 +1,7 @@
 import math
 import random
 import numpy as np
+import classes as cl
 #import main
 import matplotlib.pyplot as plt
 
@@ -127,7 +128,7 @@ def simulation(graph,nodes,plastics,wind,drift):
 
                     
                     plastic_unit.velocity=np.linalg.norm(vector_forces) # Calculate velocity based on the combined forces vector
-                    distance = math.dist(node_coords,neigh) # EU Distance betwwen current and neighbor nodes.
+                    distance = cl.distance(node_coords,neigh) # EU Distance betwwen current and neighbor nodes.
     
 
 #################### Decision making #######################################    
