@@ -8,17 +8,29 @@ import numpy as np
 import time
 import os
 
+global ENDC
+ENDC = '\033[m'
+global REDC
+REDC = '\033[91m'
+global GREENC
+GREENC = '\033[92m'
+global YELLOWC
+YELLOWC = '\033[93m'
+def initiate_terminal_txt():
+    print(GREENC)
+    print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
+    print(YELLOWC)
+    print("|NOTES:")
+    print("|-> The simulation works by assuming a wind direction of 45 degrees (SW)")
+    print("|-> Plastiscs are being inserted into the network's nodes based on proximity to 'recreation' locations (1 to 1)"+'\n')
+    print(ENDC)
+
+
 def cls():
     os.system('cls' if os.name=='nt' else 'clear')
-    print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
-    print("|NOTES:")
-    print("|-> The simulation works by assuming a wind direction of 45 degrees (SW)")
-    print("|-> Plastiscs are being inserted into the network's nodes based on proximity to 'recreation' locations (1 to 1)"+'\n')
+    initiate_terminal_txt()
 def params(lever):
-    print("################ Plastic Movement Simulator ################"+"\n"+ "##------   TUDelft - Noria Sustainable Innovators   ------##"+"\n"+"##------      Synthesis project GEO1101 - 2021      ------##"+"\n"+"############################################################"+"\n")
-    print("|NOTES:")
-    print("|-> The simulation works by assuming a wind direction of 45 degrees (SW)")
-    print("|-> Plastiscs are being inserted into the network's nodes based on proximity to 'recreation' locations (1 to 1)"+'\n')
+    initiate_terminal_txt()
     if lever:
         while True:
             try:
@@ -26,15 +38,36 @@ def params(lever):
                 assert 0 <= Wind <= 359 
             except ValueError:
                 cls()
-                print("This is not a valid number. Try again.")
+                print(REDC+"This is not a valid number. Try again."+ENDC)
             except:
                 cls()
-                print("Direction should be in degrees (0-359). Try again.")
+                print(REDC+"Direction should be in degrees (0-359). Try again."+ENDC)
             else: 
                 return Wind
     else: return 45
-        
-def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
+
+def load_data(edge_fileNAME,node_fileNAME):
+    """IMPORTANT:   -Keep the data that you want to load in the 'Data' folder (this is hardcoded)
+                    -Don't create and put files in subfolders in the 'Data' directory
+                    -Provide the function ONLY with the name of the files (e.g. delft_waterlines.shp, region_delft_nodes.shp)
+        Return a dictionary with keys 'Edges' and 'Nodes' """
+
+    #Get the absolute paths of the code file (main.py) and its dir  
+    file_path = os.path.realpath(__file__)
+    file_dir = os.path.dirname(file_path) 
+    os.chdir(file_dir) #Set the working directory "..../..../..../PlasticMvmSimulation"
+    curr_dir = os.getcwd()
+    edges_path = os.path.join(curr_dir,"Data",edge_fileNAME) 
+    nodes_path = os.path.join(curr_dir,"Data",node_fileNAME)
+
+    #Read the shp files 
+    Edge = nx.read_shp(edges_path,simplify=False,strict=False) # Water network graph (Contains ALL nodes between different edges that are irrelevant for the project)
+    Node = nx.read_shp(nodes_path,simplify=False,strict=False) # Relevant to project node graph (DOES NOT contain any edges)
+
+    return {"Edges":Edge,"Nodes":Node}
+
+
+def plot_start(nodes, wind_direction, leeway_drift, plastics_100):
     ##### Parameters used for ploting the figures ################################
     min_x=np.min([n[0] for n in nodes.keys()])
     min_y=np.min([n[1] for n in nodes.keys()])
@@ -60,7 +93,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
 
     X=nx.Graph()
     X.add_nodes_from(pos_pls.keys())
-    l = [set(x) for x in G.edges()]
+    l = [set(x) for x in Edge_graph.edges()]
     edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
 
     plt.subplot(121)
@@ -68,7 +101,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
     plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
     plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(1, -0.02),xycoords='axes fraction',xytext=(1, -0.02),color='b')
     plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees",  xy=(0, -0.04),xycoords='axes fraction',xytext=(1, -0.04),color='r',annotation_clip=False)
-    plt.annotate("N ", xy=(1.1, 0.21),xycoords='axes fraction',xytext=(1.1, 0.21))
+    plt.annotate("Node_graph ", xy=(1.1, 0.21),xycoords='axes fraction',xytext=(1.1, 0.21))
     plt.annotate("", xy=(1.1, 0.21), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->"),annotation_clip=False)
     plt.annotate("", xy=(dx_wind, dy_wind), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='b'),annotation_clip=False)
     plt.annotate("", xy=(dx_leeway, dy_leeway), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='r'),annotation_clip=False)
@@ -78,7 +111,7 @@ def plot_start(nodes, wind_direction,leeway_drift, plastics_100):
 
     nx.draw_networkx_nodes(X, pos_node, nodelist=n_list, node_size=node_plastic_count)
     nx.draw_networkx_labels(X, pos_node, labels=pos_relabel,font_size=16,horizontalalignment='right', verticalalignment='bottom') 
-    X.add_edges_from(G.edges())
+    X.add_edges_from(Edge_graph.edges())
     nx.draw_networkx_edges(X, pos_e2)
     ###################################################
 
@@ -105,7 +138,7 @@ def plot_end(nodes,plastics_100):
 
     X=nx.Graph()
     X.add_nodes_from(pos_pls.keys())
-    l = [set(x) for x in G.edges()]
+    l = [set(x) for x in Edge_graph.edges()]
     edg=[tuple(k for k, v in pos_e2.items() if v in s1 ) for s1 in l]
 
 
@@ -121,42 +154,45 @@ def plot_end(nodes,plastics_100):
     nx.draw_networkx_nodes(X, pos_node, nodelist=pos_relabel, node_size=node_plastic_count,node_color='r')
 
     nx.draw_networkx_labels(X, pos_node, labels=pos_relabel, horizontalalignment="left",verticalalignment="bottom")
-    X.add_edges_from(G.edges())
+    X.add_edges_from(Edge_graph.edges())
     nx.draw_networkx_edges(X, pos_e2)
+
+
+
+
+
+
+
 
 
 Wind = params(1) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
 
 start_t=time.perf_counter() #initiate timer
 
-#Define the local path of the shapefile  
-edges_path = "./Data/delft_waterlines.shp"
-nodes_path = "./Data/region_delft_nodes.shp"
+nodes_and_grahps = load_data("delft_waterlines.shp","region_delft_nodes.shp")
+Edge_graph = nodes_and_grahps["Edges"]
+Node_graph = nodes_and_grahps["Nodes"]
 
 
-#Read the shp files 
-G = nx.read_shp(edges_path,simplify=False,strict=False) # Water network graph (Contains ALL nodes between different edges that are irrelevant for the project)
-N = nx.read_shp(nodes_path,simplify=False,strict=False) # Relevant to project node graph (DOES NOT contain any edges)
-
-for datadict in G.edges.items():
+for datadict in Edge_graph.edges.items():
     has_flow = datadict[1]['has_flow']
     start_node=datadict[0][0]
     end_node= datadict[0][1]
-    nx.nodes(G)[start_node].update({"class":"Irrelevant","has_flow":has_flow})
-    nx.nodes(G)[end_node].update({"class":"Irrelevant","has_flow":has_flow})
+    nx.nodes(Edge_graph)[start_node].update({"class":"Irrelevant","has_flow":has_flow})
+    nx.nodes(Edge_graph)[end_node].update({"class":"Irrelevant","has_flow":has_flow})
 
 
 
-pos_e = {k:v for k,v in enumerate(G.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...}
-pos_n = {k:v for k,v in enumerate(N.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
-pos_e2 = {v:v for v in G.nodes()}
+pos_e = {k:v for k,v in enumerate(Edge_graph.nodes())} # Get enumerated position of edges. Dictionary {0:(x0,y0),1:(x1,y1),...}
+pos_n = {k:v for k,v in enumerate(Node_graph.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
+pos_e2 = {v:v for v in Edge_graph.nodes()}
 
-#fields = pls.show_fields(G) # Get all availiable fields of the shp layer. (edges,nodes)
+#fields = pls.show_fields(Edge_graph) # Get all availiable fields of the shp layer. (edges,nodes)
 
 #######################-------------- Instantiate Objects ---------------##########################
 #Create n number of "plastic" objects at x:0 ,y:0
 n=0
-for node in N.nodes.items():
+for node in Node_graph.nodes.items():
     if not node[1]["pls_amount"]:
         node[1]["pls_amount"]=0
     n+=node[1]["pls_amount"]
@@ -165,11 +201,11 @@ plastics_100 = pls.create_plastics(n)
 plastics_to_pour = plastics_100.copy() # temporary layer used to pour all the plastic created above to the nodes depending on the latter's proximity to recreation locations.
 
 
-#Create n "node" objects. n = G.number_of_nodes() 
+#Create n "node" objects. n = Edge_graph.number_of_nodes() 
 nodes = {}
-relevant_nodes= {k[0]:k[1] for k in N.nodes.items()} #Dictionary {(x1,y1):{filed1:value1,field11:value11,..},..}
+relevant_nodes= {k[0]:k[1] for k in Node_graph.nodes.items()} #Dictionary {(x1,y1):{filed1:value1,field11:value11,..},..}
 z=0
-for d in G.nodes.items():
+for d in Edge_graph.nodes.items():
     if d[0] in relevant_nodes.keys():
         identification = relevant_nodes[d[0]]["id"]
         x_coord = d[0][0]
@@ -200,7 +236,7 @@ leeway_drift=15
 plot_start(nodes,wind_direction,leeway_drift,plastics_100)
 
 #**** Run the simulation ****#
-sim.simulation(G,nodes,plastics_100,wind_direction,leeway_drift)
+sim.simulation(Edge_graph,nodes,plastics_100,wind_direction,leeway_drift)
 #****************************#
 
 plot_end(nodes,plastics_100)
