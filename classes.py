@@ -46,7 +46,7 @@ class plastic:
 
 
 class node:
-    characteristics = ["Deadends","Junction"]
+    characteristics = ["Deadends","Junction","bridge"]
     def __init__(self, id, x, y, f):
         """ This is an object corresponding to nodes in a water network (or other).
         Currently (29-05-2021) its attributes are:

@@ -77,7 +77,6 @@ def simulation(graph,nodes,plastics,wind,drift):
             #print("We are at plastic:",plastic_unit)
             plastic_unit.activation_time+=1
             
-            
             is_in_node = plastic_unit.find_in_node(nodes) # Plastic is in a specific node (Node object) OR is free roaming (None).
             if is_in_node:
                 node_coords = is_in_node.coords()           # Coordinates of the node that the current plastic is in. 
@@ -155,7 +154,6 @@ def simulation(graph,nodes,plastics,wind,drift):
                     # plastic_unit.x=plastic_unit.going_to[0]
                     # plastic_unit.y=plastic_unit.going_to[1]
                     # Updating the coordinates happens in "insert_plastic" method.
-                    
                     plastic_unit.going_to.insert_plastic(plastic_unit)
 
                 else:

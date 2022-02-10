@@ -66,8 +66,15 @@ def load_data(edge_fileNAME,node_fileNAME):
 
     return {"Edges":Edge,"Nodes":Node}
 
+def get_sum_of_numeric_field(graph,field):
+    n=0
+    for node, field_dict in graph.nodes.items():
+        if not field_dict[field]: #Check if the field is NULL and set it to 0 pieces of plastic
+            field_dict[field]=0
+        n+=field_dict[field]
+    return n
 
-def plot_start(nodes, wind_direction, leeway_drift, plastics_100):
+def plot_start(nodes, wind_direction, leeway_drift, plastics_n):
     ##### Parameters used for ploting the figures ################################
     min_x=np.min([n[0] for n in nodes.keys()])
     min_y=np.min([n[1] for n in nodes.keys()])
@@ -83,8 +90,7 @@ def plot_start(nodes, wind_direction, leeway_drift, plastics_100):
 
     ########### 1. Display network graph figure at time BEFORE initiating the algorithm. ##################################
 
-    pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)}
-    # pos_pls =  {k:v.coords() for k,v in enumerate(plastics_100)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
+    pos_pls =  {k:v.coords() for k,v in enumerate(plastics_n)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
     n_list=[k for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0]
     pos_relabel =  { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
     node_plastic_count = list(pos_relabel.values()) # list of number of plastics at the nodes
@@ -92,7 +98,7 @@ def plot_start(nodes, wind_direction, leeway_drift, plastics_100):
 
 
     X=nx.Graph()
-    X.add_nodes_from(pos_pls.keys())
+    X.add_nodes_from(Node_graph.nodes())
     l = [set(x) for x in Edge_graph.edges()]
     edg=[tuple(k for k, v in pos_e.items() if v in s1 ) for s1 in l]
 
@@ -101,7 +107,7 @@ def plot_start(nodes, wind_direction, leeway_drift, plastics_100):
     plt.axis([min_x-200,max_x+200,min_y-200,max_y+200])
     plt.annotate("Wind Direction: "+str(wind_direction)+" degrees", xy=(1, -0.02),xycoords='axes fraction',xytext=(1, -0.02),color='b')
     plt.annotate("Leeway drift +"+str(leeway_drift)+" degrees",  xy=(0, -0.04),xycoords='axes fraction',xytext=(1, -0.04),color='r',annotation_clip=False)
-    plt.annotate("Node_graph ", xy=(1.1, 0.21),xycoords='axes fraction',xytext=(1.1, 0.21))
+    plt.annotate("N ", xy=(1.1, 0.21),xycoords='axes fraction',xytext=(1.1, 0.21))
     plt.annotate("", xy=(1.1, 0.21), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->"),annotation_clip=False)
     plt.annotate("", xy=(dx_wind, dy_wind), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='b'),annotation_clip=False)
     plt.annotate("", xy=(dx_leeway, dy_leeway), xycoords='axes fraction',xytext=(1.1, 0.1), arrowprops=dict(arrowstyle="->",color='r'),annotation_clip=False)
@@ -115,7 +121,7 @@ def plot_start(nodes, wind_direction, leeway_drift, plastics_100):
     nx.draw_networkx_edges(X, pos_e2)
     ###################################################
 
-def plot_end(nodes,plastics_100):
+def plot_end(nodes,plastics_n):
     ######### 2. Display network graph figure AFTER the completion of the simulation #####################################
     min_x=np.min([n[0] for n in nodes.keys()])
     min_y=np.min([n[1] for n in nodes.keys()])
@@ -123,13 +129,13 @@ def plot_end(nodes,plastics_100):
     max_y=np.max([n[1] for n in nodes.keys()])
 
     pls=[]
-    for p in plastics_100:
+    for p in plastics_n:
         if p.find_in_node(nodes) == None:
             pls.append(p)
 
 
     pos_pls_re =  {k:v.coords() for k,v in enumerate(pls)} # Get enumerated position of plastic units. Dictionary {0:(x1,y1),1:(x2,y2),...} 
-    pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
+    pos_pls = {k:v.coords() for k,v in enumerate(plastics_n)}
 
     pos_relabel = { k:v.has_plastics_num() for k,v in enumerate(nodes.values()) if v.has_plastics_num()>0} # Get enumerated amount of plastic units in nodes. Dictionary {0:5,1:4,2:0,..}
     node_plastic_count = list(f for f in pos_relabel.values()) # list of number of plastics at the nodes
@@ -158,96 +164,105 @@ def plot_end(nodes,plastics_100):
     nx.draw_networkx_edges(X, pos_e2)
 
 
+######################################################################################################################################################################################
+##########################################       Code starts HERE      ###############################################################################################################
+
+#Set the direction of the wind 
+Wind = params(0) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
+wind_direction=Wind
+leeway_drift=15
 
 
+#initiate timer (Irrelevant to the simulation itself)
+start_t=time.perf_counter() 
 
+#Load edge and node shapefiles from 'Data'
+nodes_and_grahps = load_data(edge_fileNAME= "waterlines_clean.shp", node_fileNAME= "nodes_clean.shp") #Return a dictionary with only keys: "Edges","Nodes" and values their corresponding graphs
+Edge_graph = nodes_and_grahps["Edges"] #Netwrokx graph of edges (waterlines)
+Node_graph = nodes_and_grahps["Nodes"] #Netwrokx graph of nodes 
+#Edge_graph.add_nodes_from(Node_graph.nodes()) #Update the nodes of the edege graph with the nodes of the node graph
+print("Number of nodes:",len(Node_graph.nodes))
 
-
-
-
-Wind = params(1) #Change this to 1 to allow the user to insert specific wind direction. 0 defaults 45 degree wind direction
-
-start_t=time.perf_counter() #initiate timer
-
-nodes_and_grahps = load_data("delft_waterlines.shp","region_delft_nodes.shp")
-Edge_graph = nodes_and_grahps["Edges"]
-Node_graph = nodes_and_grahps["Nodes"]
-
-
-for datadict in Edge_graph.edges.items():
-    has_flow = datadict[1]['has_flow']
-    start_node=datadict[0][0]
-    end_node= datadict[0][1]
+#Assign 'class' and 'flow' attributes to the nodes of the 'Waterline graph'. At first all nodes are set as "Irrelevant"
+for nodes,field_dict in Edge_graph.edges.items():
+    start_node=nodes[0]
+    end_node= nodes[1]
+    has_flow = field_dict['has_flow']
     nx.nodes(Edge_graph)[start_node].update({"class":"Irrelevant","has_flow":has_flow})
     nx.nodes(Edge_graph)[end_node].update({"class":"Irrelevant","has_flow":has_flow})
-
-
+    
 
 pos_e = {k:v for k,v in enumerate(Edge_graph.nodes())} # Get enumerated position of edges. Dictionary {0:(x0,y0),1:(x1,y1),...}
 pos_n = {k:v for k,v in enumerate(Node_graph.nodes())} # Get enumerated position of nodes. Dictionary {0:(x0,y0),1:(x1,y1),...} 
 pos_e2 = {v:v for v in Edge_graph.nodes()}
 
+
 #fields = pls.show_fields(Edge_graph) # Get all availiable fields of the shp layer. (edges,nodes)
 
-#######################-------------- Instantiate Objects ---------------##########################
+#######################-------------- Instantiate Objects (Start) ---------------##########################
+#Calculate the amount of plastic from 'pls_amount' field of the Node's graph
+total_plastic_pieces = get_sum_of_numeric_field(Node_graph,"pls_amount")
+print('Total pieces of plastics:',total_plastic_pieces)
+
 #Create n number of "plastic" objects at x:0 ,y:0
-n=0
-for node in Node_graph.nodes.items():
-    if not node[1]["pls_amount"]:
-        node[1]["pls_amount"]=0
-    n+=node[1]["pls_amount"]
-
-plastics_100 = pls.create_plastics(n)
-plastics_to_pour = plastics_100.copy() # temporary layer used to pour all the plastic created above to the nodes depending on the latter's proximity to recreation locations.
+plastics_n = pls.create_plastics(total_plastic_pieces)
+plastics_to_pour = plastics_n.copy() # temporary layer used to pour all the plastic created above to the nodes depending on the latter's proximity to recreation locations.
 
 
-#Create n "node" objects. n = Edge_graph.number_of_nodes() 
-nodes = {}
-relevant_nodes= {k[0]:k[1] for k in Node_graph.nodes.items()} #Dictionary {(x1,y1):{filed1:value1,field11:value11,..},..}
-z=0
-for d in Edge_graph.nodes.items():
-    if d[0] in relevant_nodes.keys():
-        identification = relevant_nodes[d[0]]["id"]
-        x_coord = d[0][0]
-        y_coord = d[0][1]
-        attributes = {k:relevant_nodes[d[0]][k] for k in relevant_nodes[d[0]].keys()}
-        nodes[d[0]]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate decision making node object inside a dictionary {(x1,y1):<node_object>,..}
-        for k in range(int(relevant_nodes[d[0]]["pls_amount"])):
-            nodes[d[0]].insert_plastic(plastics_to_pour.pop(-1))
-            z+=1
-    else:
-        
-        identification = str(list(pos_e.keys())[list(pos_e.values()).index(d[0])])
-        x_coord = d[0][0]
-        y_coord = d[0][1]
-        attributes = d[1]
-        nodes[d[0]]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate irrelevant node object inside a dictionary {(x1,y1):<node_object>,..}
+#Create n "node" objects. n = Edge_graph.number_of_nodes()
 
-
-#######################--------------------------------------------------##########################
-
+#NOTE:  It is important to understand that the 'Edge graph' (Edge_graph) contains nodes that define the edges but may or may not be irrelevant to the nodes that we are interested in.
+#       The nodes that we are intersted in, are located into the 'Nodes graph' (Node_graph), thus we need to impose these nodes to the nodes of the 'Edge graph'.
+#       To do this we loop through the 'Graph nodes' and when we see a node with the same coordinates as one of the nodes from the 'Nodes graph' then it means that this node IS relevant us, so we keep it and fill it with attributes
+#       To achive this, it is REQUIRED that the 'Nodes' shapefile has been extracted from the 'Edges' shapefile (meaning in practice that the nodes of 'Nodes' is a subset of the nodes of 'Edges')
+#NOTE again that due to the above data dependincy, most errors are going to originate more or less from here 
  
+nodes = {}
+relevant_nodes= {nodes:fields for nodes, fields in Node_graph.nodes.items()} #Dictionary {(x1,y1):{filed1:value1,field11:value11,..},..}
+
+
+x,y = zip(*list(relevant_nodes.keys()))
+
+for g_nodes,g_fields in Edge_graph.nodes.items():
+
+    if g_nodes in list(relevant_nodes.keys()): #Checks if a node from the 'Edges graph' is a relevant node
+        identification = relevant_nodes[g_nodes]["id"]
+        x_coord = g_nodes[0]
+        y_coord = g_nodes[1]
+        attributes = {k:relevant_nodes[g_nodes][k] for k in relevant_nodes[g_nodes].keys()}
+        nodes[g_nodes]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate decision making node object inside a dictionary {(x1,y1):<node_object>,..}
+        for k in range(int(relevant_nodes[g_nodes]["pls_amount"])):
+            nodes[g_nodes].insert_plastic(plastics_to_pour.pop(-1))
+
+    else:
+        identification = str(list(pos_e.keys())[list(pos_e.values()).index(g_nodes)])
+        x_coord = g_nodes[0]
+        y_coord = g_nodes[1]
+        attributes = g_fields
+        nodes[g_nodes]=pls.node(identification,x_coord,y_coord,attributes) #Instantiate irrelevant node object inside a dictionary {(x1,y1):<node_object>,..}
+
+#######################-------------------- Instantiate Objects (End) ------------------------------##########################
 
 ##############################################
 
-wind_direction=Wind
-leeway_drift=15
+# for node, node_obj in nodes.items():
+#     print(node,node_obj.fields)
 
-plot_start(nodes,wind_direction,leeway_drift,plastics_100)
+plot_start(nodes,wind_direction,leeway_drift,plastics_n)
 
 #**** Run the simulation ****#
-sim.simulation(Edge_graph,nodes,plastics_100,wind_direction,leeway_drift)
+sim.simulation(Edge_graph,nodes,plastics_n,wind_direction,leeway_drift)
 #****************************#
 
-plot_end(nodes,plastics_100)
+plot_end(nodes,plastics_n)
 plt.show()
 
-print("\nExecution time: "+str(round(time.perf_counter()-start_t,2))+"sec")
+print(YELLOWC+"\nExecution time: "+str(round(time.perf_counter()-start_t,2))+"sec"+ENDC)
 
 #############################################################
 
 ### ------->>>>> Export the results into a .shp file into the ./Data/plastics directory. -------->>>>> #####
-pos_pls = {k:v.coords() for k,v in enumerate(plastics_100)}
+pos_pls = {k:v.coords() for k,v in enumerate(plastics_n)}
 S=nx.DiGraph()
 S.add_nodes_from(pos_pls.values())
 a=0
@@ -255,10 +270,10 @@ for p in S.nodes.items():
     a+=1
     p[1].update({'Wkt':'POINT ('+str(p[0][0])+" "+str(p[0][1])+')','ID': nodes[p[0]].id,'pls_amount':nodes[p[0]].has_plastics_num(),'class': nodes[p[0]].fields["class"]})
 
-path = './Data/plastics/hotspots.shp' # Modify this line to either change the name of the output or change the path.
+path = os.path.join("Data","plastics","hotspots.shp") # Modify this line to either change the name of the output or change the path.
 
 nx.write_shp(S, path)
-print("Potential hotspots have been exported as .shp file in "+path)
+print(GREENC+"Potential hotspots have been exported as .shp file in "+path+ENDC)
 ### -------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>>-------->>>>> #####
 
 # TODO: Fix issue with wierd coordinate results of plastics outside of nodes.
